@@ -1,0 +1,119 @@
+/*!
+ incrementa z-index para que al momento de cargar la lista al modal no quede debajo de el siguiente input
+ */
+#lista_clientes {
+    position:absolute;
+    z-index: 1055; /* mayor que modal-body */
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* ===============================
+   FOOTER - colores redes
+   =============================== */
+
+.main-footer a i {
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+/* Instagram */
+.main-footer a:hover .fa-instagram {
+    color: #C13584;
+}
+
+/* Facebook */
+.main-footer a:hover .fa-facebook {
+    color: #1877F2;
+}
+
+/* WhatsApp */
+.main-footer a:hover .fa-whatsapp {
+    color: #25D366;
+}
+
+/* Efecto leve */
+.main-footer a:hover i {
+    transform: translateY(-2px);
+}
+
+/* ===============================
+ ASIDE - botones de estado
+=============================== */
+
+/* ===== SIDEBAR – MÓDULOS ABIERTOS ===== */
+.nav-sidebar .nav-link.modulo-abierto {
+  color: #4f6d8a;                 /* azul gris suave */
+}
+
+/* ===== MÓDULO ACTIVO ===== */
+.nav-sidebar .nav-link.modulo-activo {
+  background-color: #2c7be5;      /* azul empresa */
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* ícono del módulo activo */
+.nav-sidebar .nav-link.modulo-activo i {
+  color: #ffffff;
+}
+
+/* ===== SUBMENÚ ===== */
+.nav-sidebar .nav-treeview .nav-link.modulo-activo {
+  background-color: #e7f1ff;      /* azul MUY suave */
+  color: #2c7be5 !important;
+}
+
+/* ===== HOVER SUAVE ===== */
+.nav-sidebar .nav-link:hover {
+  background-color: rgba(44, 123, 229, 0.1);
+}
+
+/* submenú abierto pero no activo */
+.nav-sidebar .nav-treeview .nav-link.modulo-abierto:not(.modulo-activo) {
+  color: #6c8bbf;
+}
+
+
+/* ====================================
+NAVBAR - ajuste para titulo responsive
+===================================== */
+  /* ===== mayor compativilidad en mobiles ===== */
+#tituloModulo {
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* ===== bajar tamaño en pantallas chicas ===== */
+@media (max-width: 576px) {
+  #tituloModulo {
+    font-size: 0.95rem;
+  }
+}
+
+
+/* ===================================================
+ CONTENT WRAPPER BASE - sentrado y detalles img base
+====================================================== */
+
+/* Contenedor principal */
+.content-wrapper {
+  min-height: calc(100vh - 57px); /* navbar */
+}
+
+/* Estado inicial */
+#estado-inicial {
+  min-height: calc(100vh - 57px - 57px); /* navbar + footer aprox */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f4f6f9;
+}
+
+
+/* Logo */
+.isologo-home {
+  max-width: 40%;
+  opacity: 0.9;
+  mix-blend-mode: multiply; /* solo sirve para img con contraste bien definido y recomendado fondo blanco */
+}
+
