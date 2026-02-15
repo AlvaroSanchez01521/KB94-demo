@@ -7,7 +7,7 @@ class ModelosModelo{
 
 
      /* ===============================
-       Listar Viejo
+       Listar Viejo 
     =============================== */
 
     static public function mdlListarModelosPorMarca($idMarca) {
@@ -20,23 +20,20 @@ class ModelosModelo{
         return $stmt->fetchAll();
     }
 
-
     /* ===============================
-       LISTAR
+       Listar para abm modelos
     =============================== */
-    static public function mdlListarModelos(){
+    static public function mdlListarModelosPorMarcaABM($idMarca){
+        
 
         $stmt = Conexion::conectar()->prepare(
-                    "SELECT 
-                                    m.idModelo,
-                                    ma.marca,
-                                    m.modelo,
-                                    m.idMarca
-                                FROM modelos m
-                                INNER JOIN marcas ma ON ma.idMarca = m.idMarca
-                                ORDER BY ma.marca ASC, m.modelo ASC;"
+            "SELECT idModelo, modelo, idMarca
+            FROM modelos
+            WHERE idMarca = :idMarca
+            ORDER BY modelo"
         );
 
+        $stmt->bindParam(":idMarca", $idMarca, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll();

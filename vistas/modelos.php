@@ -34,8 +34,7 @@
             <thead class="thead-light">
             <tr>
                 <th style="width: 10%">#</th>
-                <th>Marca</th>
-                <th>Modelo</th>
+                <th>Modelo</th>                
                 <th style="width: 15%">Acciones</th>
             </tr>
             </thead>
@@ -104,7 +103,7 @@
 <script>
     $(document).ready(function () {
         cargarMarcas();    
-        listarModelos();       
+               
     });
 
     /* ===============================
@@ -121,6 +120,7 @@
         }
 
         listarModelosPorMarca(idMarca);
+        console.log("evento cargando tabla, ID Marca:",idMarca)
     });
 
 
@@ -133,6 +133,13 @@
     // Botón Nuevo
     $("#btnNuevoModelo").on("click", function () {
         limpiarModalModelo();
+
+        const marcaActual = $("#filtroMarca").val();
+
+        if (marcaActual) {
+            $("#selectMarca").val(marcaActual);
+        }
+
         $("#modalModelo .modal-title").text("Nuevo Modelo");
         $("#modalModelo").modal("show");
     });
@@ -155,56 +162,16 @@
 
 
     /* ===============================
-    LISTAR TODOS LOS MODELOS
-    =============================== */
-
-    function listarModelos() {
-
-        const datos = new FormData();
-        datos.append("accion", "listar");
-
-        $.ajax({
-            url: "ajax/modelos.ajax.php",
-            method: "POST",
-            data: datos,
-            cache: false,
-            contentType: false,
-            processData: false,
-            dataType: "json",
-            success: function (respuesta) {
-
-                let html = "";
-
-                respuesta.forEach((modelo) => {
-                   html += `
-                            <tr>
-                                <td>${modelo.idModelo}</td>
-                                <td>${modelo.marca}</td>
-                                <td>${modelo.modelo}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning btnEditarModelo"
-                                        data-id="${modelo.idModelo}"
-                                        data-modelo="${modelo.modelo}"
-                                        data-idmarca="${modelo.idMarca}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>`;
-
-                });
-
-                $("#tablaModelos tbody").html(html);
-            }
-        });
-    }
-
-    /* ===============================
     LISTAR MODELOS POR MARCA
     =============================== */
     function listarModelosPorMarca(idMarca) {
+        console.log("funcion de listado por marca, ID Marca:",idMarca)
 
         const datos = new FormData();
+        datos.append("accion", "listar");
         datos.append("idMarca", idMarca);
+
+        console.log(datos)
 
         $.ajax({
             url: "ajax/modelos.ajax.php",
@@ -215,19 +182,19 @@
             processData: false,
             dataType: "json",
             success: function (respuesta) {
+                console.log(respuesta)
 
                 let html = "";
 
                 respuesta.forEach((modelo) => {
                     html += `
                     <tr>
-                        <td>${modelo.idModelo}</td>
-                        <td>${modelo.marca}</td>
+                        <td>${modelo.idModelo}</td>                        
                         <td>${modelo.modelo}</td>
                         <td>
                             <button class="btn btn-sm btn-warning btnEditarModelo"
                                 data-id="${modelo.idModelo}"
-                                data-modelo="${modelo.modelo}"
+                                data-modelo="${modelo.modelo}"                                
                                 data-idmarca="${modelo.idMarca}">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -238,6 +205,7 @@
                 $("#tablaModelos tbody").html(html);
             }
         });
+        console.log("se finalizo funcion Listar modelo x marca")
     }
 
 
@@ -344,6 +312,7 @@
     =============================== */
 
     function cargarModeloParaEditar(boton) {
+        console.log(boton)
 
         const id = $(boton).data("id");
         const modelo = $(boton).data("modelo");

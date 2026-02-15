@@ -3,7 +3,7 @@
 class ModelosControlador {
 
     /* =====================================================
-       🔹 CÓDIGO VIEJO (aún en uso)
+       🔹 CÓDIGO VIEJO (aún en uso) 
        Usado para listar modelos filtrados por marca
     ===================================================== */
     static public function ctrListarModelosPorMarca($idMarca) {
@@ -13,13 +13,13 @@ class ModelosControlador {
 
 
     /* ===============================
-       LISTAR
+       LISTAR ABM (modulo modelos)
     =============================== */
-    static public function ctrListarModelos(){
-        
-        return ModelosModelo::mdlListarModelos();
-    }
 
+    static public function ctrListarModelosPorMarcaABM($idMarca) {
+
+        return ModelosModelo::mdlListarModelosPorMarcaABM($idMarca);
+    }
 
     /* ===============================
        CREAR

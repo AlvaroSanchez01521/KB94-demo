@@ -3,35 +3,32 @@
 require_once "../controladores/modelos.controlador.php";
 require_once "../modelos/modelos.modelo.php";
 
-class AjaxModelos{
+class AjaxModelos {
+
+    public $idMarca;
 
     /* =====================================================
        🔹 CÓDIGO VIEJO (aún en uso)
-       Listar modelos por marca (usado en selects dependientes)
     ===================================================== */
-    public $idMarca;
-
     public function ajaxListarModelosPorMarca() {
 
         $modelos = ModelosControlador::ctrListarModelosPorMarca($this->idMarca);
         echo json_encode($modelos, JSON_UNESCAPED_UNICODE);
     }
 
-
     /* ===============================
-       LISTAR (ABM y selects generales)
+       LISTAR ABM
     =============================== */
-    public function ajaxListarModelos(){
+    public function ajaxListarModelosPorMarcaABM() {
 
-        $modelos = ModelosControlador::ctrListarModelos();
+        $modelos = ModelosControlador::ctrListarModelosPorMarcaABM($this->idMarca);
         echo json_encode($modelos, JSON_UNESCAPED_UNICODE);
     }
-
 
     /* ===============================
        CREAR
     =============================== */
-    public function ajaxCrearModelo(){
+    public function ajaxCrearModelo() {
 
         $respuesta = ModelosControlador::ctrCrearModelo(
             $_POST["modelo"],
@@ -41,11 +38,10 @@ class AjaxModelos{
         echo $respuesta;
     }
 
-
     /* ===============================
        EDITAR
     =============================== */
-    public function ajaxEditarModelo(){
+    public function ajaxEditarModelo() {
 
         $respuesta = ModelosControlador::ctrEditarModelo(
             $_POST["idModelo"],
@@ -55,7 +51,6 @@ class AjaxModelos{
 
         echo $respuesta;
     }
-
 }
 
 
@@ -70,7 +65,8 @@ if (isset($_POST["accion"])) {
     switch ($_POST["accion"]) {
 
         case "listar":
-            $ajax->ajaxListarModelos();
+            $ajax->idMarca = $_POST["idMarca"]; // nesecita el idMarca xq el listado es filtrado y hay q pasarlo manualmente del _POST al objeto
+            $ajax->ajaxListarModelosPorMarcaABM();
             break;
 
         case "crear":
@@ -82,21 +78,14 @@ if (isset($_POST["accion"])) {
             break;
     }
 
-    exit; 
-    /*
-    🔴 exit corta completamente la ejecución
-    evita entrar al sistema viejo
-    */
+    exit;
 }
-
 
 /* =====================================================
    🔹 SISTEMA VIEJO (compatibilidad)
-   🔹 Solo responde cuando llega idMarca
-   🔹 Usado por selects dependientes Marca → Modelos
 ===================================================== */
 
-if (isset($_POST["idMarca"])) {
+if (!isset($_POST["accion"]) && isset($_POST["idMarca"])) {
 
     $modelos = new AjaxModelos();
     $modelos->idMarca = $_POST["idMarca"];
