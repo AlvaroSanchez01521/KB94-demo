@@ -6,7 +6,7 @@
         <h1 class="m-0"> </h1>
       </div>
       <div class="col-sm-6 text-right">
-        <button class="btn btn-primary btn-sm" id="btnNuevaLocalidad">
+        <button class="btn btn-primary btn-sm" id="loc_btnNueva">
           <i class="fas fa-plus"></i> Nueva Localidad
         </button>
       </div>
@@ -20,7 +20,7 @@
     <div class="card">
       <div class="card-body">
 
-        <table id="tablaLocalidades" class="table table-bordered table-hover">
+        <table id="loc_tabla" class="table table-bordered table-hover">
           <thead class="thead-light">
             <tr>
               <th style="width: 15%">CP</th>
@@ -40,7 +40,7 @@
 </div>
 
 <!-- MODAL LOCALIDAD -->
-<div class="modal fade" id="modalLocalidad" tabindex="-1">
+<div class="modal fade" id="loc_modal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
 
@@ -53,18 +53,17 @@
 
       <div class="modal-body">
 
-        <form id="formLocalidad">
-          
+        <form id="loc_form">
           <div class="form-group">
             <label>Código Postal</label>
-            <input type="number" class="form-control" id="cpLocalidad"  maxlength="6" required>
-            <small class="text-danger d-none" id="errorCpLocalidad"></small>
+            <input type="number" class="form-control" id="loc_cp">
+            <small class="text-danger d-none" id="loc_errorCp"></small>
           </div>
 
           <div class="form-group">
             <label>Localidad</label>
-            <input type="text" class="form-control" id="nombreLocalidad" maxlength="60" required>
-            <small class="text-danger d-none" id="errorNombreLocalidad"></small>
+            <input type="text" class="form-control" id="loc_nombre">
+            <small class="text-danger d-none" id="loc_errorNombre"></small>
           </div>
 
         </form>
@@ -75,7 +74,7 @@
         <button class="btn btn-secondary" data-dismiss="modal">
           Cancelar
         </button>
-        <button class="btn btn-success" id="btnGuardarLocalidad" type="submit" form="formLocalidad">
+        <button class="btn btn-success" id="loc_btnGuardar" type="submit" form="loc_form">
           Guardar
         </button>
       </div>
@@ -84,71 +83,69 @@
   </div>
 </div>
 
-<script>
+<script> // se utiliza IIFE para evitar conflico con los demas modulos abiertos
+var ModLocalidades = (function(){
 
-  $(document).ready(function () {
-    listarLocalidades();
-  });
-
+  // =============================
+  // INIT
+  // =============================
+  function init(){
+    eventos();
+    listar();
+  }
 
   // =============================
   // EVENTOS
   // =============================
+  function eventos(){
 
-  // Nuevo
-  $("#btnNuevaLocalidad").on("click", function () {
-    limpiarModalLocalidad();
-    $("#modalLocalidad .modal-title").text("Nueva Localidad");
-    $("#modalLocalidad").modal("show");
-  });
+    // Nuevo
+    $("#loc_btnNueva").on("click", function(){
+      limpiarModal();
+      $("#loc_modal .modal-title").text("Nueva Localidad");
+      $("#loc_modal").modal("show");
+    });
 
-  // Submit del form (ENTER y botón)
-  $("#formLocalidad").on("submit", function (e) {
-    e.preventDefault();
-    guardarLocalidad();
-  });
+    // Submit form
+    $("#loc_form").on("submit", function(e){
+      e.preventDefault();
+      guardar();
+    });
 
-  // Editar
-  $(document).on("click", ".btnEditarLocalidad", function () {
-    cargarLocalidadParaEditar(this);
-  });
+    // Editar
+    $(document).on("click", ".btnEditarLocalidad", function(){
+      cargarParaEditar(this);
+    });
 
-  // Limpiar al cerrar modal
-  $("#modalLocalidad").on("hidden.bs.modal", function () {
-    limpiarModalLocalidad();
-  });
+    // Limpiar al cerrar
+    $("#loc_modal").on("hidden.bs.modal", limpiarModal);
 
-  // Limpiar error al escribir
-  $("#cpLocalidad, #nombreLocalidad").on("input", function () {
-    limpiarErroresLocalidad();
-  });
-
-
+    // Limpiar errores al escribir
+    $("#loc_cp, #loc_nombre").on("input", limpiarErrores);
+  }
 
   // =============================
   // LISTAR
   // =============================
+  function listar(){
 
-  function listarLocalidades() {
-
-    let datos = new FormData();
-    datos.append("accion", "listar");
+    let loc_datos = new FormData();
+    loc_datos.append("accion", "listar");
 
     $.ajax({
       url: "ajax/localidades.ajax.php",
       method: "POST",
-      data: datos,
+      data: loc_datos,
       cache: false,
       contentType: false,
       processData: false,
       dataType: "json",
 
-      success: function (respuesta) {
+      success: function(respuesta){
 
         let filas = "";
 
-        respuesta.forEach(function (loc) {
-
+        respuesta.forEach(function(loc){
           filas += `
             <tr>
               <td>${loc.cp}</td>
@@ -160,161 +157,128 @@
                   <i class="fas fa-edit"></i>
                 </button>
               </td>
-            </tr>
-          `;
+            </tr>`;
         });
 
-        $("#tablaLocalidades tbody").html(filas);
+        $("#loc_tabla tbody").html(filas);
       }
     });
   }
 
-
   // =============================
   // CARGAR PARA EDITAR
   // =============================
+  function cargarParaEditar(boton){
 
-  function cargarLocalidadParaEditar(boton) {
+    const loc_cp = $(boton).data("cp");
+    const loc_nombre = $(boton).data("localidad");
 
-    const cp = $(boton).data("cp");
-    const localidad = $(boton).data("localidad");
+    $("#loc_cp").val(loc_cp).prop("disabled", true);
+    $("#loc_nombre").val(loc_nombre);
 
-    $("#cpLocalidad")
-      .val(cp)
-      .prop("disabled", true);
-
-    $("#nombreLocalidad").val(localidad);
-
-    $("#modalLocalidad .modal-title").text("Editar Localidad");
-
-    $("#modalLocalidad").modal("show");
+    $("#loc_modal .modal-title").text("Editar Localidad");
+    $("#loc_modal").modal("show");
   }
-
 
   // =============================
   // GUARDAR
   // =============================
+  function guardar(){
 
-  function guardarLocalidad() {
+    limpiarErrores();
 
-    limpiarErroresLocalidad();
+    const loc_cp = $("#loc_cp").val().trim();
+    const loc_nombre = $("#loc_nombre").val().trim();
 
-    const cp = $("#cpLocalidad").val().trim();
-    const localidad = $("#nombreLocalidad").val().trim();
-
-    if (cp === "") {
+    if(loc_cp === ""){
       mostrarErrorCP("El CP es obligatorio");
       return;
     }
 
-    if (localidad === "") {
-      mostrarErrorLocalidad("La localidad es obligatoria");
+    if(loc_nombre === ""){
+      mostrarErrorNombre("La localidad es obligatoria");
       return;
     }
 
-    let datos = new FormData();
+    let loc_datos = new FormData();
 
-    if ($("#cpLocalidad").prop("disabled")) {
-      datos.append("accion", "editar");
-    } else {
-      datos.append("accion", "crear");
+    if($("#loc_cp").prop("disabled")){
+      loc_datos.append("accion", "editar");
+    }else{
+      loc_datos.append("accion", "crear");
     }
 
-    datos.append("cp", cp);
-    datos.append("localidad", localidad);
+    loc_datos.append("cp", loc_cp);
+    loc_datos.append("localidad", loc_nombre);
 
     $.ajax({
       url: "ajax/localidades.ajax.php",
       method: "POST",
-      data: datos,
+      data: loc_datos,
       cache: false,
       contentType: false,
       processData: false,
 
-      success: function (respuesta) {
+      success: function(respuesta){
 
-        console.log(respuesta)
-
-        if (respuesta === "ok") {
-
-          $("#modalLocalidad").modal("hide");
-          listarLocalidades();
+        if(respuesta === "ok"){
+          $("#loc_modal").modal("hide");
+          listar();
           toastr.success("Guardado correctamente");
 
-        } else if (respuesta === "duplicado") {
+        }else if(respuesta === "duplicado"){
+          mostrarErrorNombre("Ya existe una localidad con este nombre");
 
-          mostrarErrorLocalidad("Ya existe una localidad con este nombre");
-
-        } else if (respuesta === "sin_cambios") {
-
+        }else if(respuesta === "sin_cambios"){
           toastr.info("No se realizaron cambios");
 
-        } else if (respuesta === "vacio") {
-
+        }else if(respuesta === "vacio"){
           toastr.warning("Todos los campos son obligatorios");
 
-        } else {
-
+        }else{
           toastr.error("Error al guardar localidad");
         }
       }
     });
   }
 
-
   // =============================
   // LIMPIAR MODAL
   // =============================
-
-  function limpiarModalLocalidad() {
-
-    $("#formLocalidad")[0].reset();
-
-    $("#cpLocalidad").prop("disabled", false);
-
-    limpiarErroresLocalidad();
+  function limpiarModal(){
+    $("#loc_form")[0].reset();
+    $("#loc_cp").prop("disabled", false);
+    limpiarErrores();
   }
-
 
   // =============================
-  // MANEJO DE ERRORES
+  // ERRORES
   // =============================
-
-  function mostrarErrorCP(mensaje) {
-
-    $("#cpLocalidad")
-      .addClass("is-invalid")
-      .focus();
-
-    $("#errorCpLocalidad")
-      .text(mensaje)
-      .removeClass("d-none");
+  function mostrarErrorCP(msg){
+    $("#loc_cp").addClass("is-invalid").focus();
+    $("#loc_errorCp").text(msg).removeClass("d-none");
   }
 
-  function mostrarErrorLocalidad(mensaje) {
-
-    $("#nombreLocalidad")
-      .addClass("is-invalid")
-      .focus();
-
-    $("#errorNombreLocalidad")
-      .text(mensaje)
-      .removeClass("d-none");
+  function mostrarErrorNombre(msg){
+    $("#loc_nombre").addClass("is-invalid").focus();
+    $("#loc_errorNombre").text(msg).removeClass("d-none");
   }
 
-  function limpiarErroresLocalidad() {
-
-    $("#cpLocalidad").removeClass("is-invalid");
-    $("#nombreLocalidad").removeClass("is-invalid");
-
-    $("#errorCpLocalidad")
-      .addClass("d-none")
-      .text("");
-
-    $("#errorNombreLocalidad")
-      .addClass("d-none")
-      .text("");
+  function limpiarErrores(){
+    $("#loc_cp, #loc_nombre").removeClass("is-invalid");
+    $("#loc_errorCp, #loc_errorNombre").addClass("d-none").text("");
   }
 
+  // =============================
+  // API pública
+  // =============================
+  return {
+    init: init,
+    listar: listar
+  };
 
+})();
+$(document).ready(function(){
+  ModLocalidades.init();
+});
 </script>
