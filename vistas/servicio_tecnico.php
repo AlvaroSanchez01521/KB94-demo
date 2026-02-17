@@ -340,7 +340,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
 
 <script>
     var accion;
-    var table;
+
     var selectedClienteIndex = -1; // Variable glabal utilizada principalemtne para el js de flechita y enter del listado de clientes en modal
 
 
@@ -355,10 +355,17 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
-
+    
     // cargar listado en tabla con el plugin datatable js (tabla principal OT)
     function fnc_cargar_tbl_serviciotecnico(){
-        table = $("#tbl_serviciotecnico").DataTable({
+        // 🔴 Si la tabla ya fue inicializada, destruirla antes de crearla nuevamente
+        if ($.fn.DataTable.isDataTable('#tbl_serviciotecnico')) {
+            $('#tbl_serviciotecnico').DataTable().destroy();
+            //$('#tbl_serviciotecnico').empty();
+        }
+
+        // 🔹 variable LOCAL → evita conflictos globales
+        const table = $("#tbl_serviciotecnico").DataTable({
 
             dom: 'Bfrtip',
             buttons: [
@@ -731,6 +738,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
             }
         });
     }
+
     // bloquea modelo hasta elejir marca
     function bloquearModelo() {
         $("#modal_modelo").empty();
@@ -828,6 +836,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
 
         return true;
     }
+
     //disparador validador modelos modal
     $("#modal_modelo").on("change", function () {
         validarModelo();
@@ -1030,14 +1039,14 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
 
     // Carga de la lista de clientes al modal clientes
     $(document).on("click", "#lista_clientes a", function (e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    $("#modal_idcliente").val($(this).data("id"));
-    $("#modal_nombrecliente").val($(this).text());
+        $("#modal_idcliente").val($(this).data("id"));
+        $("#modal_nombrecliente").val($(this).text());
 
-    clienteValido(); // cambia validacion a valido
+        clienteValido(); // cambia validacion a valido
 
-    $("#lista_clientes").empty();
+        $("#lista_clientes").empty();
     });
 
     //cierra listado clientes al perder foco
@@ -1259,8 +1268,8 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
                                 icon: "success",
                                 title: "Orden de Trabajo registrada correctamente"
                             });
-
-                            table.ajax.reload();
+                            fnc_cargar_tbl_serviciotecnico();
+                            //table.ajax.reload();
                             fnc_limpiarFormularioModal();
 
                         } else {
