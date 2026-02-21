@@ -356,7 +356,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
     1- VARIABLES GLOBALES
     ===================================== */
     // variable donde carga el DataTable (se usa constante dentro de la funcion xq crea conflicto con las demas DataTable)
-    // var st_table
+    let st_table = null;
         
     //  Acción global del módulo (2=crear, 3=obtener, 4=actualizar)
     let accion = null;
@@ -371,6 +371,27 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
     ===================================== */
 
         //EVENTOS//
+
+    // Evento q ejecuta al leer el .php
+    $(document).ready(function () {
+        fnc_cargar_tbl_serviciotecnico(); // tabla principañ
+        fnc_cargarSelectMarcaBuscada(); // select del buscador
+        fnc_Tooltips(); // ayuda memoria ?
+    }); 
+
+    // hace funcionar el ? de alado del titulo (guia de estado)
+    function fnc_Tooltips() {
+
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl, {
+                html: true,
+                placement: 'right'
+            });
+        });
+
+    }
 
     // evento click de editar para pasar idOT y luego update
     $(document).on("click", ".btnEditarServicioTecnico", function(){
@@ -490,7 +511,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
 
     // Evento para criterio de busqueda 
     $("#st_busqueda_ot").keyup(function(){
-        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
+        st_table.column($(this).data('index')).search(this.value).draw();
     });
    
     $("#st_busqueda_marca").change(function() {
@@ -503,11 +524,11 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
     });
 
     $("#st_busqueda_modelo").keyup(function(){
-        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
+        st_table.column($(this).data('index')).search(this.value).draw();
     });
 
     $("#st_busqueda_cliente").keyup(function(){
-        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
+        st_table.column($(this).data('index')).search(this.value).draw();
     });
 
     // BUSQUEDA POR RANGO DE FECHA   $.fn.dataTable.ext.search.push( 
@@ -713,20 +734,6 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
-    // hace funcionar el ? de alado del titulo (guia de estado)
-    $(document).ready(function () {
-
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-
-        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl, {
-                html: true,
-                placement: 'right'
-            });
-        });
-
-    });
-
     // INICIALIZAMOS EL MENSAJE DE TIPO TOAST (EMERGENTE EN LA PARTE SUPERIOR)
     var Toast = Swal.mixin({
         toast: true,
@@ -878,7 +885,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
         //  Quita validaciones JS
         $("#st_nombre_cliente").removeClass("is-valid is-invalid");
         $("#st_tecnico").removeClass("is-valid is-invalid");
-        $("#st_marca").removeClass("is-valid is-invalid");
+        $("#st_marca").removeClass("is-valid is-invalid").prop("disabled", false);
         $("#st_modelo").removeClass("is-valid is-invalid");
         $("#st_presupuesto").removeClass("is-valid is-invalid");
         $("#st_falla").removeClass("is-valid is-invalid");
@@ -1205,7 +1212,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
                 // LIMPIA el select antes de cargar ya que sino vuelve a cargarlo cada vez que se abre el modal
                 $("#st_tecnico").empty();
 
-                var options = '<option selected value="">Seleccione tecnico</option>';
+                var options = '<option value="">Seleccione técnico</option>';
 
                 for (let index = 0; index < respuesta.length; index++) {
                     options += '<option value=' + respuesta[index][0] + '>' + respuesta[index][1] + '</option>';
@@ -1323,75 +1330,71 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
     ===================================== */
 
         // FUNCINES //
-    
-    function fnc_registrarServicioTecnico() {
+function fnc_registrarServicioTecnico() {
 
-        console.log("Validaciones superadas, listo para registrar OT");
+    console.log("Validaciones superadas, listo para registrar OT");
 
-        Swal.fire({
-            title: '¿Está seguro de registrar Orden de Trabajo?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, continuar',
-            cancelButtonText: 'Cancelar',
-        }).then((result) => {
+    Swal.fire({
+        title: accion == 2 // cambia el texto ente update y crear
+            ? '¿Está seguro de registrar Orden de Trabajo?' 
+            : '¿Está seguro de actualizar Orden de Trabajo?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, continuar',
+        cancelButtonText: 'Cancelar',
+    }).then((result) => {
 
-            if (result.isConfirmed) {
+        if (result.isConfirmed) {
 
-                var datos = new FormData();
+            var datos = new FormData();
 
-                datos.append("accion", accion);
-                datos.append("idOT", $("#st_ot").val());
-                datos.append("fechaIngreso", $("#st_fecha_ingreso").val());
-                datos.append("idCliente", $("#st_id_cliente").val());
-                datos.append("idTecnico", $("#st_tecnico").val());
-                datos.append("idModelo", $("#st_modelo").val());
-                datos.append("falla", $("#st_falla").val());
-                datos.append("observaciones", $("#st_observaciones").val());
-                datos.append("presupuesto", $("#st_presupuesto").val());
-                datos.append("fechaCierre", $("#st_fecha_cierre").val());
-                datos.append("fechaEntrega", $("#st_fecha_entrega").val());
+            datos.append("accion", accion);
+            datos.append("idOT", $("#st_ot").val());
+            datos.append("fechaIngreso", $("#st_fecha_ingreso").val());
+            datos.append("idCliente", $("#st_id_cliente").val());
+            datos.append("idTecnico", $("#st_tecnico").val());
+            datos.append("idModelo", $("#st_modelo").val());
+            datos.append("falla", $("#st_falla").val());
+            datos.append("observaciones", $("#st_observaciones").val());
+            datos.append("presupuesto", $("#st_presupuesto").val());
+            datos.append("fechaCierre", $("#st_fecha_cierre").val());
+            datos.append("fechaEntrega", $("#st_fecha_entrega").val());
 
-                $.ajax({
-                    url: "ajax/servicio_tecnico.ajax.php",
-                    method: "POST",
-                    data: datos,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    dataType: "json",
-                    success: function (respuesta) {
+            $.ajax({
+                url: "ajax/servicio_tecnico.ajax.php",
+                method: "POST",
+                data: datos,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: function (respuesta) {
 
-                        if (respuesta === "ok") {
-                            Toast.fire({
-                                icon: "success",
-                                title: "Orden de Trabajo registrada correctamente"
-                            });
-                            fnc_cargar_tbl_serviciotecnico();
-                            fnc_limpiarFormularioModal();
+                    if (respuesta === "ok" || respuesta.status === "ok") {
+                        Toast.fire({
+                            icon: "success",
+                            title: "Orden de Trabajo registrada correctamente"
+                        });
+                        fnc_cargar_tbl_serviciotecnico();
+                        fnc_limpiarFormularioModal();
 
-                        } else {
-                            Toast.fire({
-                                icon: "error",
-                                title: "No se pudo registrar la Orden de Trabajo"
-                            });
-                        }
+                    } else {
+                        Toast.fire({
+                            icon: "error",
+                            title: "No se pudo registrar la Orden de Trabajo"
+                        });
                     }
-                });
-            }
-        });
-    }
-
-
-
-
-
-
-
-
-
-
-
+                },
+                error: function () {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Error de comunicación con el servidor"
+                    });
+                }
+            });
+        }
+    });
+}
 </script>
 
 
