@@ -1,7 +1,7 @@
 /*!
  incrementa z-index para que al momento de cargar la lista al modal no quede debajo de el siguiente input
  */
-#lista_clientes {
+#st_lista_clientes {
     position:absolute;
     z-index: 1055; /* mayor que modal-body */
     max-height: 200px;

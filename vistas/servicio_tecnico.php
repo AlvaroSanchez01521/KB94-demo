@@ -221,7 +221,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
                             </div>
                         </div>
 
-                        <!-- Nombre Cliente-->
+                        <!-- Nombre Cliente-- Utiliza css en id=st_lista_clientes {-->
                         <div class="col-12">
                             <div class="form-floating mb-2">
                                                                 
@@ -340,26 +340,224 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
 
 
 <script>
+        /* Indice
+    1. VARIABLES GLOBALES
+    2. TABLA PRINCIPAL
+    3. MODAL OT
+    4. DATOS RELACIONADOS
+    ├── Clientes
+    ├── Marca / Modelo
+    └── Técnicos
+    5. VALIDACIONES
+    6. REGISTRO Y ACTUALIZACIÓN
+        */
+
+    /* ====================================
+    1- VARIABLES GLOBALES
+    ===================================== */
+    // variable donde carga el DataTable (se usa constante dentro de la funcion xq crea conflicto con las demas DataTable)
+    // var st_table
+        
     //  Acción global del módulo (2=crear, 3=obtener, 4=actualizar)
-    var accion;
+    let accion = null;
 
     //  Índice seleccionado en el autocomplete de clientes (uso con flechas ↑ ↓ y Enter)
-    var selectedClienteIndex = -1; 
+    let selectedClienteIndex = -1; 
 
+    /* ====================================
+    2- TABLA Y PANEL PRINCIPAL 
+    (Listado y filtros)
+    Responsabilidad: mostrar OT, permitir búsquedas e inicializaciones
+    ===================================== */
 
-    //  Formatea fechas a dd/mm/yyyy SOLO visualmente.
-    //  Internamente se mantiene yyyy-mm-dd para no romper búsquedas ni ordenamientos.
-    function formatearFechaDMY(fecha) {
+        //EVENTOS//
 
-        if (!fecha || fecha === "0000-00-00") {
-            return "";
+    // evento click de editar para pasar idOT y luego update
+    $(document).on("click", ".btnEditarServicioTecnico", function(){
+
+        let fila = $(this).closest("tr");
+
+        // obtiene el valor de la fila en la q esta
+        if (fila.hasClass("child")) {
+            fila = fila.prev();
         }
 
-        let partes = fecha.split("-");
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
+        let data = st_table.row(fila).data();
+        let idOT = data[1]; // se utiliza la columna 1 xq la 0 es una columna vacia q pide el datatable
+        console.log("ID OT seleccionado:", idOT); // DEBUG
 
-    
+        accion = 3;
+
+        let datos = new FormData();
+        datos.append("accion", accion);
+        datos.append("idOT", idOT);
+
+        $.ajax({
+            url: "ajax/servicio_tecnico.ajax.php",
+            method: "POST",
+            data: datos,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function(respuesta){
+                console.log("OT obtenida:", respuesta); // DEBUG
+                accion = 4; // UPDATE
+
+                // cambia titulo y boton de modal (para mas facha)
+                $("#st_titulo_modal_ot").text("Editar Orden de Trabajo");
+                $("#st_btn_guardar .text-button").text("ACTUALIZAR");
+
+                // muestro modal
+                $("#st_modal_ot").modal("show");
+
+                // cargo datos simples
+                $("#st_ot").val(respuesta.idOT).prop("disabled", true);
+                $("#st_fecha_ingreso").val(respuesta.fechaIngreso).prop("disabled", true);
+                $("#st_falla").val(respuesta.falla);
+                $("#st_observaciones").val(respuesta.observaciones);
+                $("#st_presupuesto").val(respuesta.presupuesto);
+                
+                // cargo input del listado + cambia estado del bloqueo
+                $("#st_id_cliente").val(respuesta.idCliente);
+                $("#st_nombre_cliente")
+                    .val(respuesta.cliente)
+                    .removeClass("is-invalid")
+                    .addClass("is-valid");
+                
+                // muestra tecnico (el select trae el id pero la funcion trae todo, se reutiliza)
+                fnc_cargarSelectTecnicoModal();
+                setTimeout(() => {
+                    $("#st_tecnico")
+                        .val(respuesta.idTecnico)
+                        .prop("disabled", false)
+                        .addClass("is-valid");
+                }, 300);
+                
+                // marca + modelo, dependiendo el modelo de la marca
+                // carga marca -> selecciona marca -> carga modelo -> selecciona modelo
+                fnc_cargarSelectMarcaModal();
+                setTimeout(() => {
+
+                    // Marca
+                    $("#st_marca")
+                        .val(respuesta.idMarca)
+                        .prop("disabled", true)
+                        .addClass("is-valid");
+
+                    // Habilitamos modelo
+                    $("#st_modelo").prop("disabled", false);
+
+                    let datos = new FormData();
+                    datos.append("idMarca", respuesta.idMarca);
+
+                    $.ajax({
+                        url: "ajax/modelos.ajax.php",
+                        method: "POST",
+                        data: datos,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        dataType: "json",
+                        success: function(modelos){
+
+                            $("#st_modelo").empty()
+                                .append('<option value="">Seleccione modelo</option>');
+
+                            modelos.forEach(m => {
+                                $("#st_modelo").append(
+                                    `<option value="${m[0]}">${m[1]}</option>`
+                                );
+                            });
+
+                            $("#st_modelo")
+                                .val(respuesta.idModelo)
+                                .addClass("is-valid");
+                        }
+                    });
+
+                }, 300);
+
+                // ?? "" → Si fecha viene null, se asigna string vacío para evitar errores en el input
+                $("#st_fecha_cierre").val(respuesta.fechaCierre ?? "").prop("disabled", false);
+                $("#st_fecha_entrega").val(respuesta.fechaEntrega ?? "").prop("disabled", false);
+                
+                // limpio validaciones viejas
+                $(".needs-validation").removeClass("was-validated");
+            }
+        });
+    });
+
+    // Evento para criterio de busqueda 
+    $("#st_busqueda_ot").keyup(function(){
+        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
+    });
+   
+    $("#st_busqueda_marca").change(function() {
+
+        if (this.value != 0) {
+            $('#st_tabla_ot').DataTable().column($(this).data('index')).search('^' + this.value + '$', true, false).draw();
+        } else {
+            $('#st_tabla_ot').DataTable().column($(this).data('index')).search("").draw();
+        }
+    });
+
+    $("#st_busqueda_modelo").keyup(function(){
+        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
+    });
+
+    $("#st_busqueda_cliente").keyup(function(){
+        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
+    });
+
+    // BUSQUEDA POR RANGO DE FECHA   $.fn.dataTable.ext.search.push( 
+    $("#st_fecha_desde, #st_fecha_hasta").change(function () {
+        if (st_table) st_table.draw(); // se asegura q la st_table este creada antes de ejecutar
+    });
+
+    $.fn.dataTable.ext.search.push(
+        function (settings, data, dataIndex) {
+
+            let dateIni = $('#st_fecha_desde').val();
+            let dateFin = $('#st_fecha_hasta').val();
+
+            let indexCol = 2; // fecha ingreso
+
+            if (dateIni) dateIni = dateIni.replace(/-/g, "");
+            if (dateFin) dateFin = dateFin.replace(/-/g, "");
+
+            let dateCol = data[indexCol];
+
+            if (!dateCol) return true;
+
+            // DD/MM/YYYY → YYYYMMDD
+            dateCol = dateCol.split("/").reverse().join("");
+
+            if (!dateIni && !dateFin) return true;
+            if (!dateIni) return dateCol <= dateFin;
+            if (!dateFin) return dateCol >= dateIni;
+
+            return dateCol >= dateIni && dateCol <= dateFin;
+        }
+    );
+
+        // Boton limpieza buscador
+    $("#st_btn_limpiar_busqueda").on('click', function() {
+
+        $("#st_busqueda_ot").val('');
+        $("#st_busqueda_marca").val('');
+        $("#st_busqueda_modelo").val('');
+        $("#st_busqueda_cliente").val('');
+        $("#st_fecha_desde").val('');
+        $("#st_fecha_hasta").val('');
+
+        $("#st_tabla_ot").DataTable().search('').columns().search('').draw();
+    });
+
+
+        // FUNCIONES //
+
+        
     // Cargar listado en DataTable (tabla principal OT)
     function fnc_cargar_tbl_serviciotecnico(){
 
@@ -369,7 +567,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
         }
 
         //  Variable GLOBAL del módulo (evita conflictos con otras tablas)
-        table = $("#st_tabla_ot").DataTable({
+        st_table = $("#st_tabla_ot").DataTable({
 
             dom: 'Bfrtip',
             buttons: [
@@ -379,6 +577,7 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
                     action:function(e, dt, node, config){
 
                         // 🔹 Abrir modal en modo ALTA
+                        fnc_limpiarFormularioModal();
                         $("#st_modal_ot").modal('show');
                         $("#st_titulo_modal_ot").text("Nueva Orden de Trabajo");
                         $("#st_btn_guardar .text-button").text("GUARDAR");
@@ -479,671 +678,81 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
         });
     }
 
-    //1
-//////////////////////////////////
-    //2
-// evento click de editar para pasar idOT y luego update
-$(document).on("click", ".btnEditarServicioTecnico", function(){
-
-    let fila = $(this).closest("tr");
-
-    // obtiene el valor de la fila en la q esta
-    if (fila.hasClass("child")) {
-        fila = fila.prev();
-    }
-
-    let data = table.row(fila).data();
-    let idOT = data[1]; // se utiliza la columna 1 xq la 0 es una columna vacia q pide el datatable
-    console.log("ID OT seleccionado:", idOT); // DEBUG
-
-    accion = 3;
-
-    let datos = new FormData();
-    datos.append("accion", accion);
-    datos.append("idOT", idOT);
-
-    $.ajax({
-        url: "ajax/servicio_tecnico.ajax.php",
-        method: "POST",
-        data: datos,
-        cache: false,
-        contentType: false,
-        processData: false,
-        dataType: "json",
-        success: function(respuesta){
-            console.log("OT obtenida:", respuesta); // DEBUG
-            accion = 4; // UPDATE
-
-            // cambia titulo y boton de modal (para mas facha)
-            $("#st_titulo_modal_ot").text("Editar Orden de Trabajo");
-            $("#st_btn_guardar .text-button").text("ACTUALIZAR");
-
-            // muestro modal
-            $("#st_modal_ot").modal("show");
-
-            // cargo datos simples
-            $("#st_ot").val(respuesta.idOT).prop("disabled", true);
-            $("#st_fecha_ingreso").val(respuesta.fechaIngreso).prop("disabled", true);
-            $("#st_falla").val(respuesta.falla);
-            $("#st_observaciones").val(respuesta.observaciones);
-            $("#st_presupuesto").val(respuesta.presupuesto);
-            
-            // cargo input del listado + cambia estado del bloqueo
-            $("#st_id_cliente").val(respuesta.idCliente);
-            $("#st_nombre_cliente")
-                .val(respuesta.cliente)
-                .removeClass("is-invalid")
-                .addClass("is-valid");
-            
-            // muestra tecnico (el select trae el id pero la funcion trae todo, se reutiliza)
-            fnc_cargarSelectTecnicoModal();
-            setTimeout(() => {
-                $("#st_tecnico")
-                    .val(respuesta.idTecnico)
-                    .prop("disabled", false)
-                    .addClass("is-valid");
-            }, 300);
-            
-            // marca + modelo, dependiendo el modelo de la marca
-            // carga marca -> selecciona marca -> carga modelo -> selecciona modelo
-            fnc_cargarSelectMarcaModal();
-            setTimeout(() => {
-
-                // Marca
-                $("#st_marca")
-                    .val(respuesta.idMarca)
-                    .prop("disabled", true)
-                    .addClass("is-valid");
-
-                // Habilitamos modelo
-                $("#st_modelo").prop("disabled", false);
-
-                let datos = new FormData();
-                datos.append("idMarca", respuesta.idMarca);
-
-                $.ajax({
-                    url: "ajax/modelos.ajax.php",
-                    method: "POST",
-                    data: datos,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    dataType: "json",
-                    success: function(modelos){
-
-                        $("#st_modelo").empty()
-                            .append('<option value="">Seleccione modelo</option>');
-
-                        modelos.forEach(m => {
-                            $("#st_modelo").append(
-                                `<option value="${m[0]}">${m[1]}</option>`
-                            );
-                        });
-
-                        $("#st_modelo")
-                            .val(respuesta.idModelo)
-                            .addClass("is-valid");
-                    }
-                });
-
-            }, 300);
-
-            // ?? "" → Si fecha viene null, se asigna string vacío para evitar errores en el input
-            $("#st_fecha_cierre").val(respuesta.fechaCierre ?? "").prop("disabled", false);
-            $("#st_fecha_entrega").val(respuesta.fechaEntrega ?? "").prop("disabled", false);
-            
-            // limpio validaciones viejas
-            $(".needs-validation").removeClass("was-validated");
-        }
-    });
-});
-
-
-// funcion congruencia fechas
-function validarSecuenciaFechas(fechaIngreso, fechaCierre, fechaEntrega){
-
-    if(!fechaIngreso){
-        alert("Debe existir una fecha de ingreso");
-        return false;
-    }
-
-    let fIngreso  = new Date(fechaIngreso);
-    let fCierre   = fechaCierre ? new Date(fechaCierre) : null;
-    let fEntrega  = fechaEntrega ? new Date(fechaEntrega) : null;
-
-    // Entrega sin cierre
-    if(fEntrega && !fCierre){
-        alert("No se puede asignar fecha de entrega sin fecha de cierre");
-        return false;
-    }
-
-    // Cierre menor que ingreso
-    if(fCierre && fCierre < fIngreso){
-        alert("La fecha de cierre no puede ser menor que la fecha de ingreso");
-        return false;
-    }
-
-    // Entrega menor que cierre
-    if(fEntrega && fEntrega < fCierre){
-        alert("La fecha de entrega no puede ser menor que la fecha de cierre");
-        return false;
-    }
-
-    return true; // todo OK
-}
-
-
-// Cargar select Marca del buscador
-function fnc_cargarSelectMarcaBuscada(){
-      
-    $.ajax({
-        url: "ajax/marcas.ajax.php",
-        cache: false,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function(respuesta) {
-
-            var options = '<option selected value="">Seleccione una marca</option>';
-
-            for (let index = 0; index < respuesta.length; index++) {
-                options += '<option value=' + respuesta[index][1] + '>' + respuesta[index][1] + '</option>';
-            }
-
-            // ID actualizado
-            $("#st_busqueda_marca").empty().append(options);
-        }
-    });    
-}
-
-
-// hace funcionar el ? de alado del titulo (guia de estado)
-$(document).ready(function () {
-
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-
-    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-        new bootstrap.Tooltip(tooltipTriggerEl, {
-            html: true,
-            placement: 'right'
-        });
-    });
-
-});
-
-
-// INICIALIZAMOS EL MENSAJE DE TIPO TOAST (EMERGENTE EN LA PARTE SUPERIOR)
-var Toast = Swal.mixin({
-    toast: true,
-    position: 'top',
-    showConfirmButton: false,
-    timer: 3000
-});
-
-
-// Al abrir modal se ejecuta + fecha hoy en alta
-$("#st_modal_ot").on("shown.bs.modal", function () {
-    if (accion === 2) { // solo carga la fecha de hoy en modal si es un ingreso, no si es update
-        fnc_cargarFechaIngresoHoy();
-    }
-});
-
-
-// cargar fecha actual automáticamente
-function fnc_cargarFechaIngresoHoy() {
-
-    const hoy = new Date();
-
-    const yyyy = hoy.getFullYear();
-    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
-    const dd = String(hoy.getDate()).padStart(2, '0');
-
-    const fechaHoy = `${yyyy}-${mm}-${dd}`;
-
-    $("#st_fecha_ingreso").val(fechaHoy);
-}
-
-
-// Cargar select marca
-function fnc_cargarSelectMarcaModal(){
-        
-    $.ajax({
-        url: "ajax/marcas.ajax.php",
-        cache: false,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function(respuesta) {
-
-            // Limpiamos antes de cargar (evitar duplicados)
-            $("#st_marca").empty();
-
-            // Opción inicial
-            var options = '<option value="">Seleccione marca</option>';
-
-            // Cargamos marcas
-            for (var index = 0; index < respuesta.length; index++) {
-
-                options +=
-                    '<option value="' + respuesta[index][0] + '">' + respuesta[index][1] + '</option>';
-            }
-
-            /*
-                Texto visible  → respuesta[index][1] (nombre marca)
-                Valor enviado  → respuesta[index][0] (ID marca)
-            */
-
-            // Insertamos opciones
-            $("#st_marca").append(options);
-
-            // Al cargar marcas, modelo debe quedar bloqueado
-            bloquearModelo();
-        }
-    });
-}
-
-
-// bloquea modelo hasta elejir marca
-function bloquearModelo() {
-    $("#st_modelo").empty();
-    $("#st_modelo").append('<option value="">Seleccione modelo</option>');
-    $("#st_modelo").prop("disabled", true);
-    $("#st_modelo").removeClass("is-valid is-invalid");
-    console.log("Input modelos bloqueado"); // DEBUG
-}
-
-
-// validacion marca
-function validarMarca() {
-
-    const marca = $("#st_marca");
-
-    // Si no hay marca seleccionada, return
-    if (marca.val() === "") {
-        marca.addClass("is-invalid").removeClass("is-valid");
-        console.log("Marca vacía, modelos bloqueados"); // DEBUG
-        bloquearModelo();
-        return false;
-    }
-
-    marca.removeClass("is-invalid").addClass("is-valid");
-    console.log("Marca válida seleccionada:", marca); // DEBUG
-    return true;
-}
-
-    //2
-//////////////////////////////////
-    //3
-    // disparador validador marca + habilita modelo + carga select modelos 
-    $("#st_marca").on("change", function () {
-
-        // limpiamos y bloqueamos modelos al cambiar marca
-        bloquearModelo();
-
-        if (!validarMarca()) { // Si la marca NO es válida, corto la ejecución
-            return;
-        }
-
-        var idMarca = $(this).val();
-        console.log("Inicio validación idMarca:", idMarca); // DEBUG
-
-        var datos = new FormData();
-        datos.append("idMarca", idMarca);
-
-        $.ajax({
-            url: "ajax/modelos.ajax.php",
-            method: "POST",
-            data: datos,
-            cache: false,
-            contentType: false,
-            processData: false,
-            dataType: "json",
-            success: function (respuesta) {
-
-                if (!respuesta || respuesta.length === 0) { // Si no hay respuesta o está vacía
-
-                    Toast.fire({
-                        icon: 'warning',
-                        title: 'La marca seleccionada no tiene modelos cargados'
-                    });
-
-                    console.log("La marca NO tiene modelos cargados"); // DEBUG
-                    // Se mantiene bloqueado modelos
-                    return;
-                }
-
-                // Si hay modelos → habilitamos
-                $("#st_modelo").prop("disabled", false);
-
-                for (var i = 0; i < respuesta.length; i++) {
-                    $("#st_modelo").append(
-                        '<option value="' + respuesta[i][0] + '">' + respuesta[i][1] + '</option>'
-                    );
-                }
-
-                console.log("Modelos cargados para marca", idMarca); // DEBUG
-            }
-        });
-    });
-
-
-    // validar modelos
-    function validarModelo() {
-
-        var idModelo = $("#st_modelo").val();
-
-        if (idModelo === "" || $("#st_modelo").prop("disabled")) {
-            $("#st_modelo").removeClass("is-valid")
-            $("#st_modelo").addClass("is-invalid");
-            console.log("modelo NO pasa validacion"); // DEBUG
-            return false;
-        }
-
-        $("#st_modelo").removeClass("is-invalid")
-        $("#st_modelo").addClass("is-valid");
-        console.log("modelo SI pasa validacion"); // DEBUG
-
-        return true;
-    }
-
-
-    // disparador validador modelos modal
-    $("#st_modelo").on("change", function () {
-        validarModelo();
-    });
-
-
-    // Cargar input select tecnicos
-    function fnc_cargarSelectTecnicoModal(){
+    // Cargar select Marca del buscador
+    function fnc_cargarSelectMarcaBuscada(){
         
         $.ajax({
-            url: "ajax/tecnicos.ajax.php",
+            url: "ajax/marcas.ajax.php",
             cache: false,
             contentType: false,
             processData: false,
             dataType: 'json',
             success: function(respuesta) {
 
-                // LIMPIA el select antes de cargar ya que sino vuelve a cargarlo cada vez que se abre el modal
-                $("#st_tecnico").empty();
-
-                var options = '<option selected value="">Seleccione tecnico</option>';
+                var options = '<option selected value="">Seleccione una marca</option>';
 
                 for (let index = 0; index < respuesta.length; index++) {
-                    options += '<option value=' + respuesta[index][0] + '>' + respuesta[index][1] + '</option>';
+                    options += '<option value=' + respuesta[index][1] + '>' + respuesta[index][1] + '</option>';
                 }
 
-                $("#st_tecnico").append(options);  
-                console.log(respuesta); //  DEBUG      
+                // ID actualizado
+                $("#st_busqueda_marca").empty().append(options);
             }
-        });      
+        });    
     }
 
+    //  Formatea fechas a dd/mm/yyyy SOLO visualmente.
+    //  Internamente se mantiene yyyy-mm-dd para no romper búsquedas ni ordenamientos.
+    function formatearFechaDMY(fecha) {
 
-    // validar input tecnicos
-    function validarTecnico() {
-
-        const tecnico = $("#st_tecnico");
-
-        if (tecnico.val() === "") {
-            tecnico.addClass("is-invalid").removeClass("is-valid");
-            return false;
+        if (!fecha || fecha === "0000-00-00") {
+            return "";
         }
 
-        tecnico.removeClass("is-invalid").addClass("is-valid");
-        return true;
+        let partes = fecha.split("-");
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
+    // hace funcionar el ? de alado del titulo (guia de estado)
+    $(document).ready(function () {
 
-    // disparador validador tecnico
-    $("#st_tecnico").on("change", function () {
-        validarTecnico();
-    });
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
 
-
-    // Evento para criterio de busqueda 
-    $("#st_busqueda_ot").keyup(function(){
-        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
-    });
-
-    $("#st_busqueda_marca").change(function() {
-
-        if (this.value != 0) {
-            $('#st_tabla_ot').DataTable().column($(this).data('index')).search('^' + this.value + '$', true, false).draw();
-        } else {
-            $('#st_tabla_ot').DataTable().column($(this).data('index')).search("").draw();
-        }
-    });
-
-    $("#st_busqueda_modelo").keyup(function(){
-        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
-    });
-
-    $("#st_busqueda_cliente").keyup(function(){
-        $("#st_tabla_ot").DataTable().column($(this).data('index')).search(this.value).draw();
-    });
-
-
-    // BUSQUEDA POR RANGO DE FECHA    
-    $("#st_fecha_desde, #st_fecha_hasta").change(function () {
-        table.draw(); // ⚠️ depende de variable Table (fnc_cargar_tbl_serviciotecnico)
-    });
-
-
-    $.fn.dataTable.ext.search.push(
-        function (settings, data, dataIndex) {
-
-            let dateIni = $('#st_fecha_desde').val();
-            let dateFin = $('#st_fecha_hasta').val();
-
-            let indexCol = 2; // fecha ingreso
-
-            if (dateIni) dateIni = dateIni.replace(/-/g, "");
-            if (dateFin) dateFin = dateFin.replace(/-/g, "");
-
-            let dateCol = data[indexCol];
-
-            if (!dateCol) return true;
-
-            // DD/MM/YYYY → YYYYMMDD
-            dateCol = dateCol.split("/").reverse().join("");
-
-            if (!dateIni && !dateFin) return true;
-            if (!dateIni) return dateCol <= dateFin;
-            if (!dateFin) return dateCol >= dateIni;
-
-            return dateCol >= dateIni && dateCol <= dateFin;
-        }
-    );
-
-
-    // Boton limpieza buscador
-    $("#st_btn_limpiar_busqueda").on('click', function() {
-
-        $("#st_busqueda_ot").val('');
-        $("#st_busqueda_marca").val('');
-        $("#st_busqueda_modelo").val('');
-        $("#st_busqueda_cliente").val('');
-        $("#st_fecha_desde").val('');
-        $("#st_fecha_hasta").val('');
-
-        $("#st_tabla_ot").DataTable().search('').columns().search('').draw();
-    });
-
-
-    // lista clientes segun nombre buscado + ignora flechita y enter + declara invalida x defecto
-    $("#st_nombre_cliente").on("keyup", function (e) {
-
-        // Ignoramos flechas y enter
-        if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
-            return;
-        }
-
-        clienteInvalido(); // ← CLAVE: escribir invalida el ID
-
-        let termino = $(this).val();
-        selectedClienteIndex = -1;
-
-        if (termino.length < 2) {
-            $("#st_lista_clientes").empty();
-            return;
-        }
-
-        $.ajax({
-            url: "ajax/clientes.ajax.php",
-            type: "POST",
-            data: {
-                accion: 1,
-                termino: termino
-            },
-            dataType: "json",
-            success: function (respuesta) {
-
-                let html = "";
-
-                respuesta.forEach((cliente, index) => {
-                    html += `
-                        <a href="#"
-                        class="list-group-item list-group-item-action"
-                        data-id="${cliente.idCliente}"
-                        data-index="${index}">
-                        ${cliente.nombre}
-                        </a>
-                    `;
-                });
-
-                $("#st_lista_clientes").html(html);
-            }
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl, {
+                html: true,
+                placement: 'right'
+            });
         });
+
+    });
+
+    // INICIALIZAMOS EL MENSAJE DE TIPO TOAST (EMERGENTE EN LA PARTE SUPERIOR)
+    var Toast = Swal.mixin({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 3000
     });
 
 
-    // navega en listado con flechitas + acepta con enter + pinta seleccionado
-    $("#st_nombre_cliente").on("keydown", function (e) {
+    /* ====================================
+    3- MODAL OT 
+    (Base del flujo)
+    Responsabilidad: apertura, estados y limpieza
+    Variables relacionadas: accion selectedClienteIndex
+    ===================================== */
 
-        let items = $("#st_lista_clientes a");
-
-        if (!items.length) return;
-
-        if (e.key === "ArrowDown") {
-            e.preventDefault();
-            selectedClienteIndex = (selectedClienteIndex + 1) % items.length;
-        }
-
-        if (e.key === "ArrowUp") {
-            e.preventDefault();
-            selectedClienteIndex = (selectedClienteIndex - 1 + items.length) % items.length;
-        }
-
-        if (e.key === "Enter") {
-            e.preventDefault();
-            if (selectedClienteIndex >= 0) {
-                $(items[selectedClienteIndex]).click();
-            }
-            return;
-        }
-        
-        // Item activo se pinta (Bootstrap active)
-        items.removeClass("active");
-
-        if (selectedClienteIndex >= 0) {
-            $(items[selectedClienteIndex]).addClass("active");
+        //EVENTOS//
+    
+    // Al abrir modal se ejecuta + fecha hoy en alta
+    $("#st_modal_ot").on("shown.bs.modal", function () {
+        if (accion === 2) { // solo carga la fecha de hoy en modal si es un ingreso, no si es update
+            fnc_cargarFechaIngresoHoy();
         }
     });
 
-
-    // Carga de la lista de clientes al modal clientes
-    $(document).on("click", "#st_lista_clientes a", function (e) {
-        e.preventDefault();
-
-        $("#st_id_cliente").val($(this).data("id"));
-        $("#st_nombre_cliente").val($(this).text());
-
-        clienteValido(); // cambia validacion a valido
-
-        $("#st_lista_clientes").empty();
-    });
-
-
-    // cierra listado clientes al perder foco
-    $("#st_nombre_cliente").on("blur", function () {
-        setTimeout(function () { // se usa setTimeout porque blur se ejecuta antes que click
-            $("#st_lista_clientes").empty();
-        }, 150);
-    });
-
-
-    // permite volver a cargar listado clientes si saliste del foco antes
-    $("#st_nombre_cliente").on("focus", function () {
-        $("#st_lista_clientes").empty();
-    });
-
-
-    // validacion de campos a traves de js (front)
-    function clienteValido() {
-        $("#st_nombre_cliente").removeClass("is-invalid").addClass("is-valid");
-    }
-
-    function clienteInvalido() {
-        $("#st_nombre_cliente").removeClass("is-valid").addClass("is-invalid");
-        $("#st_id_cliente").val("");
-    }
-
-
-    // validador de existencia de texto pensado para falla y observaciones
-    function validarTexto(inputId) {
-
-        var input = $("#" + inputId);
-        var valor = input.val().trim();
-
-        if (valor.length === 0) {
-            input.addClass("is-invalid").removeClass("is-valid");
-            return false;
-        }
-
-        input.addClass("is-valid").removeClass("is-invalid");
-        return true;
-    }
-
-    //3
-/////////////////////////////////////////////
-    //4
-
-
-    //  Disparadores de validación para campos de texto
-    $("#st_falla").on("blur", function () {
-        validarTexto("st_falla");
-    });
-
-    $("#st_observaciones").on("blur", function () {
-        validarTexto("st_observaciones");
-    });
-
-    //  Validador campo presupuesto modal
-    function validarPresupuesto() {
-
-        var valor = $("#st_presupuesto").val();
-
-        if (valor === "" || parseFloat(valor) < 0) {
-            $("#st_presupuesto").addClass("is-invalid").removeClass("is-valid");
-            return false;
-        }
-
-        $("#st_presupuesto").addClass("is-valid").removeClass("is-invalid");
-        return true;
-    }
-
-    //  Disparador validador presupuesto modal
-    $("#st_presupuesto").on("blur keyup", function () {
-        validarPresupuesto();
-    });
-
-
-    /*===================================================================*/
-    // R E G I S T R O   Y   A C T U A L I Z A C I O N   D E   OT        //
-    /*===================================================================*/
-
-    //  EVENTO GUARDAR → VALIDACIONES + REGISTRO
+        //  EVENTO GUARDAR → VALIDACIONES + REGISTRO
     $("#st_btn_guardar").on('click', function () {
 
         /* ================= VALIDAR TÉCNICO ================= */
@@ -1240,11 +849,481 @@ function validarMarca() {
         fnc_registrarServicioTecnico();
     });
 
+    //  Limpiar inputs y ocultar modal
+    $("#st_btn_cancelar, #st_btn_cerrar_modal").on('click', function() {
+        fnc_limpiarFormularioModal();
+    });
 
-    /* ============================================================
-        REGISTRAR / ACTUALIZAR OT
-    ============================================================ */
+        // FUNCIONES //
 
+    function fnc_limpiarFormularioModal(){
+
+        //  Inputs
+        $("#st_ot").val("");
+        fnc_cargarFechaIngresoHoy();
+        $("#st_marca").val("");
+        $("#st_modelo").val("");
+        $("#st_tecnico").val("");
+        $("#st_id_cliente").val("");
+        $("#st_nombre_cliente").val("");
+        $("#st_falla").val("");
+        $("#st_observaciones").val("");
+        $("#st_presupuesto").val("");
+        $("#st_fecha_cierre").val("").prop("disabled", true);
+        $("#st_fecha_entrega").val("").prop("disabled", true);
+
+        //  Quita validaciones Bootstrap
+        $(".needs-validation").removeClass("was-validated");
+
+        //  Quita validaciones JS
+        $("#st_nombre_cliente").removeClass("is-valid is-invalid");
+        $("#st_tecnico").removeClass("is-valid is-invalid");
+        $("#st_marca").removeClass("is-valid is-invalid");
+        $("#st_modelo").removeClass("is-valid is-invalid");
+        $("#st_presupuesto").removeClass("is-valid is-invalid");
+        $("#st_falla").removeClass("is-valid is-invalid");
+        $("#st_observaciones").removeClass("is-valid is-invalid");
+
+        //  Estado inicial del modal
+        bloquearModelo();
+        accion = null;
+
+        $("#st_titulo_modal_ot").text("Nueva Orden de Trabajo");
+        $("#st_btn_guardar .text-button").text("GUARDAR");
+
+        //  Cierra modal
+        $("#st_modal_ot").modal('hide');
+    }
+
+    // cargar fecha actual automáticamente
+    function fnc_cargarFechaIngresoHoy() {
+
+        const hoy = new Date();
+
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoy.getDate()).padStart(2, '0');
+
+        const fechaHoy = `${yyyy}-${mm}-${dd}`;
+
+        $("#st_fecha_ingreso").val(fechaHoy);
+    }
+
+    /* ====================================
+    4- DATOS RELACIONADOS 
+    (Clientes + Marca/Modelo + Técnicos)
+    agrupados porque pertenecen al mismo flujo del modal
+    ===================================== */
+    /* === 👤 Clientes (autocomplete) === */
+
+        // EVENTOS //
+        
+    // lista clientes segun nombre buscado + ignora flechita y enter + declara invalida x defecto
+    $(document).on("keyup", "#st_nombre_cliente", function (e) {
+        
+        // Ignoramos flechas y enter
+        if (["ArrowDown", "ArrowUp", "Enter"].includes(e.key)) {
+            return;
+        }
+
+        clienteInvalido(); //  escribir invalida el ID
+
+        let termino = $(this).val();
+        selectedClienteIndex = -1;
+
+        if (termino.length < 2) {
+            $("#st_lista_clientes").empty();
+            return;
+        }
+        console.log("Inicia fragemento funcion peticion ajax clientes para listar");
+        $.ajax({
+            url: "ajax/clientes.ajax.php",
+            type: "POST",
+            data: {
+                accion: 1,
+                termino: termino
+            },
+            dataType: "json",
+            success: function (respuesta) {
+                console.log("Clientes listados:", respuesta);
+                let html = "";
+
+                respuesta.forEach((cliente, index) => {
+                    html += `
+                        <a href="#"
+                        class="list-group-item list-group-item-action"
+                        data-id="${cliente.idCliente}"
+                        data-index="${index}">
+                        ${cliente.nombre}
+                        </a>
+                    `;
+                });
+
+                $("#st_lista_clientes").html(html);
+            }
+        });     
+    });
+
+    // navega en listado con flechitas + acepta con enter + pinta seleccionado
+    $(document).on("keydown", "#st_nombre_cliente", function (e) {
+
+        let items = $("#st_lista_clientes a");
+
+        if (!items.length) return;
+
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            selectedClienteIndex = (selectedClienteIndex + 1) % items.length;
+        }
+
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            selectedClienteIndex = (selectedClienteIndex - 1 + items.length) % items.length;
+        }
+
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (selectedClienteIndex >= 0) {
+                $(items[selectedClienteIndex]).click();
+            }
+            return;
+        }
+        
+        // Item activo se pinta (Bootstrap active)
+        items.removeClass("active");
+
+        if (selectedClienteIndex >= 0) {
+            $(items[selectedClienteIndex]).addClass("active");
+        }
+    });
+
+    // Carga de la lista de clientes al modal clientes
+    $(document).on("click", "#st_lista_clientes a", function (e) {
+        e.preventDefault();
+
+        $("#st_id_cliente").val($(this).data("id"));
+        $("#st_nombre_cliente").val($(this).text());
+
+        clienteValido(); // cambia validacion a valido
+
+        $("#st_lista_clientes").empty();
+    });
+
+    // cierra listado clientes al perder foco
+    $(document).on("blur", "#st_nombre_cliente", function () {
+        setTimeout(function () { // se usa setTimeout porque blur se ejecuta antes que click
+            $("#st_lista_clientes").empty();
+        }, 150);
+    });
+
+    // permite volver a cargar listado clientes si saliste del foco antes
+    $(document).on("focus", "#st_nombre_cliente", function () {
+        $("#st_lista_clientes").empty();
+    });
+
+        // FUNCIONES //
+
+    // validacion de campos a traves de js (front)
+    function clienteValido() {
+        $("#st_nombre_cliente").removeClass("is-invalid").addClass("is-valid");
+    }
+
+    function clienteInvalido() {
+        $("#st_nombre_cliente").removeClass("is-valid").addClass("is-invalid");
+        $("#st_id_cliente").val("");
+    }
+
+    /* === 🏷 Marca / Modelo === */
+
+        // EVENTOS //
+
+    // disparador validador marca + habilita modelo + carga select modelos 
+    $("#st_marca").on("change", function () {
+
+        // limpiamos y bloqueamos modelos al cambiar marca
+        bloquearModelo();
+
+        if (!validarMarca()) { // Si la marca NO es válida, corto la ejecución
+            return;
+        }
+
+        var idMarca = $(this).val();
+        console.log("Inicio validación idMarca:", idMarca); // DEBUG
+
+        var datos = new FormData();
+        datos.append("idMarca", idMarca);
+
+        $.ajax({
+            url: "ajax/modelos.ajax.php",
+            method: "POST",
+            data: datos,
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function (respuesta) {
+
+                if (!respuesta || respuesta.length === 0) { // Si no hay respuesta o está vacía
+
+                    Toast.fire({
+                        icon: 'warning',
+                        title: 'La marca seleccionada no tiene modelos cargados'
+                    });
+
+                    console.log("La marca NO tiene modelos cargados"); // DEBUG
+                    // Se mantiene bloqueado modelos
+                    return;
+                }
+
+                // Si hay modelos → habilitamos
+                $("#st_modelo").prop("disabled", false);
+
+                for (var i = 0; i < respuesta.length; i++) {
+                    $("#st_modelo").append(
+                        '<option value="' + respuesta[i][0] + '">' + respuesta[i][1] + '</option>'
+                    );
+                }
+
+                console.log("Modelos cargados para marca", idMarca); // DEBUG
+            }
+        });
+    });
+    
+    // disparador validador modelos modal
+    $("#st_modelo").on("change", function () {
+        validarModelo();
+    });
+
+        // FUNCIONES //
+
+    // Cargar select marca
+    function fnc_cargarSelectMarcaModal(){
+            
+        $.ajax({
+            url: "ajax/marcas.ajax.php",
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(respuesta) {
+
+                // Limpiamos antes de cargar (evitar duplicados)
+                $("#st_marca").empty();
+
+                // Opción inicial
+                var options = '<option value="">Seleccione marca</option>';
+
+                // Cargamos marcas
+                for (var index = 0; index < respuesta.length; index++) {
+
+                    options +=
+                        '<option value="' + respuesta[index][0] + '">' + respuesta[index][1] + '</option>';
+                }
+
+                /*
+                    Texto visible  → respuesta[index][1] (nombre marca)
+                    Valor enviado  → respuesta[index][0] (ID marca)
+                */
+
+                // Insertamos opciones
+                $("#st_marca").append(options);
+
+                // Al cargar marcas, modelo debe quedar bloqueado
+                bloquearModelo();
+            }
+        });
+    }
+
+    // bloquea modelo hasta elejir marca
+    function bloquearModelo() {
+        $("#st_modelo").empty();
+        $("#st_modelo").append('<option value="">Seleccione modelo</option>');
+        $("#st_modelo").prop("disabled", true);
+        $("#st_modelo").removeClass("is-valid is-invalid");
+        console.log("Input modelos bloqueado"); // DEBUG
+    }
+
+    // validacion marca
+    function validarMarca() {
+
+        const marca = $("#st_marca");
+
+        // Si no hay marca seleccionada, return
+        if (marca.val() === "") {
+            marca.addClass("is-invalid").removeClass("is-valid");
+            console.log("Marca vacía, modelos bloqueados"); // DEBUG
+            bloquearModelo();
+            return false;
+        }
+
+        marca.removeClass("is-invalid").addClass("is-valid");
+        console.log("Marca válida seleccionada:", marca); // DEBUG
+        return true;
+    }
+
+    // validar modelos
+    function validarModelo() {
+
+        var idModelo = $("#st_modelo").val();
+
+        if (idModelo === "" || $("#st_modelo").prop("disabled")) {
+            $("#st_modelo").removeClass("is-valid")
+            $("#st_modelo").addClass("is-invalid");
+            console.log("modelo NO pasa validacion"); // DEBUG
+            return false;
+        }
+
+        $("#st_modelo").removeClass("is-invalid")
+        $("#st_modelo").addClass("is-valid");
+        console.log("modelo SI pasa validacion"); // DEBUG
+
+        return true;
+    }
+
+    /* === 👨‍🔧 Técnicos === */
+
+        // EVENTOS //
+
+    // disparador validador tecnico
+    $("#st_tecnico").on("change", function () {
+        validarTecnico();
+    });
+      
+        // FUNCIONES //
+
+    // Cargar input select tecnicos
+    function fnc_cargarSelectTecnicoModal(){
+        
+        $.ajax({
+            url: "ajax/tecnicos.ajax.php",
+            cache: false,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(respuesta) {
+
+                // LIMPIA el select antes de cargar ya que sino vuelve a cargarlo cada vez que se abre el modal
+                $("#st_tecnico").empty();
+
+                var options = '<option selected value="">Seleccione tecnico</option>';
+
+                for (let index = 0; index < respuesta.length; index++) {
+                    options += '<option value=' + respuesta[index][0] + '>' + respuesta[index][1] + '</option>';
+                }
+
+                $("#st_tecnico").append(options);  
+                console.log("listado tecnicos:",respuesta);       
+            }
+        });      
+    }
+
+    // validar input tecnicos
+    function validarTecnico() {
+
+        const tecnico = $("#st_tecnico");
+
+        if (tecnico.val() === "") {
+            tecnico.addClass("is-invalid").removeClass("is-valid");
+            return false;
+        }
+
+        tecnico.removeClass("is-invalid").addClass("is-valid");
+        return true;
+    }
+
+    /* ====================================
+    5- VALIDACIONES
+    Responsabilidad: integridad de datos del formulario
+    ===================================== */
+
+        // EVENTOS //
+
+    //  Disparadores de validación para campos de texto
+    $("#st_falla").on("blur", function () {
+        validarTexto("st_falla");
+    });
+
+    $("#st_observaciones").on("blur", function () {
+        validarTexto("st_observaciones");
+    });
+
+    //  Disparador validador presupuesto modal
+    $("#st_presupuesto").on("blur keyup", function () {
+        validarPresupuesto();
+    });
+
+        // FUNCIONES //
+
+    // validador de existencia de texto pensado para falla y observaciones
+    function validarTexto(inputId) {
+
+        var input = $("#" + inputId);
+        var valor = input.val().trim();
+
+        if (valor.length === 0) {
+            input.addClass("is-invalid").removeClass("is-valid");
+            return false;
+        }
+
+        input.addClass("is-valid").removeClass("is-invalid");
+        return true;
+    }
+
+    //  Validador campo presupuesto modal
+    function validarPresupuesto() {
+
+        var valor = $("#st_presupuesto").val();
+
+        if (valor === "" || parseFloat(valor) < 0) {
+            $("#st_presupuesto").addClass("is-invalid").removeClass("is-valid");
+            return false;
+        }
+
+        $("#st_presupuesto").addClass("is-valid").removeClass("is-invalid");
+        return true;
+    }
+
+    // funcion congruencia fechas
+    function validarSecuenciaFechas(fechaIngreso, fechaCierre, fechaEntrega){
+
+        if(!fechaIngreso){
+            alert("Debe existir una fecha de ingreso");
+            return false;
+        }
+
+        let fIngreso  = new Date(fechaIngreso);
+        let fCierre   = fechaCierre ? new Date(fechaCierre) : null;
+        let fEntrega  = fechaEntrega ? new Date(fechaEntrega) : null;
+
+        // Entrega sin cierre
+        if(fEntrega && !fCierre){
+            alert("No se puede asignar fecha de entrega sin fecha de cierre");
+            return false;
+        }
+
+        // Cierre menor que ingreso
+        if(fCierre && fCierre < fIngreso){
+            alert("La fecha de cierre no puede ser menor que la fecha de ingreso");
+            return false;
+        }
+
+        // Entrega menor que cierre
+        if(fEntrega && fEntrega < fCierre){
+            alert("La fecha de entrega no puede ser menor que la fecha de cierre");
+            return false;
+        }
+
+        return true; // todo OK
+    }
+
+
+    /* ====================================
+    6- REGISTRO Y ACTUALIZACIÓN
+    Responsabilidad: guardar y actualizar OT
+    ===================================== */
+
+        // FUNCINES //
+    
     function fnc_registrarServicioTecnico() {
 
         console.log("Validaciones superadas, listo para registrar OT");
@@ -1303,49 +1382,16 @@ function validarMarca() {
         });
     }
 
-    // 🔹 Limpiar inputs y ocultar modal
-    $("#st_btn_cancelar, #st_btn_cerrar_modal").on('click', function() {
-        fnc_limpiarFormularioModal();
-    });
 
-    function fnc_limpiarFormularioModal(){
 
-        //  Inputs
-        $("#st_ot").val("");
-        fnc_cargarFechaIngresoHoy();
-        $("#st_marca").val("");
-        $("#st_modelo").val("");
-        $("#st_tecnico").val("");
-        $("#st_id_cliente").val("");
-        $("#st_nombre_cliente").val("");
-        $("#st_falla").val("");
-        $("#st_observaciones").val("");
-        $("#st_presupuesto").val("");
-        $("#st_fecha_cierre").val("").prop("disabled", true);
-        $("#st_fecha_entrega").val("").prop("disabled", true);
 
-        //  Quita validaciones Bootstrap
-        $(".needs-validation").removeClass("was-validated");
 
-        //  Quita validaciones JS
-        $("#st_nombre_cliente").removeClass("is-valid is-invalid");
-        $("#st_tecnico").removeClass("is-valid is-invalid");
-        $("#st_marca").removeClass("is-valid is-invalid");
-        $("#st_modelo").removeClass("is-valid is-invalid");
-        $("#st_presupuesto").removeClass("is-valid is-invalid");
-        $("#st_falla").removeClass("is-valid is-invalid");
-        $("#st_observaciones").removeClass("is-valid is-invalid");
 
-        //  Estado inicial del modal
-        bloquearModelo();
-        accion = null;
 
-        $("#st_titulo_modal_ot").text("Nueva Orden de Trabajo");
-        $("#st_btn_guardar .text-button").text("GUARDAR");
 
-        //  Cierra modal
-        $("#st_modal_ot").modal('hide');
-    }
+
+
+
 </script>
 
 
@@ -1375,106 +1421,59 @@ function validarMarca() {
 
 
 <script>
-    /* ============================================================
-       🚨🚨🚨 CÓDIGO EXPERIMENTAL / OBSOLETO (NO BORRAR AÚN) 🚨🚨🚨
-       ============================================================ */
-    // 🔴 función vieja basada en validación HTML5
-    // 🔴 Mantener hasta confirmar estabilidad del nuevo flujo
-    function funcionexperimental_registrarServicioTecnico(){
+/* ============================================================
 
-        var forms = document.getElementsByClassName('needs-validation');
+    
+ Prefijar IDs (Servicio Técnico)
 
-        var validation = Array.prototype.filter.call(forms, function(form) {
+Objetivo: evitar colisiones entre módulos.
 
-            if (form.checkValidity() === true) {
+Usaremos el prefijo:
 
-                console.log("Validaciones superadas para proceder con el registro de Orden de Trabajo")
+st_
 
-                Swal.fire({
-                    title: 'Está seguro de registrar Orden de Trabajo?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Si, continuar!',
-                    cancelButtonText: 'Cancelar',
-                }).then((result) => {
+🔧 IDs que deben cambiar
 
-                    if (result.isConfirmed) {
-
-                        var datos = new FormData();
-
-                        datos.append("accion", accion);
-                        datos.append("idOT", $("#modal_OT").val());
-                        datos.append("fechaIngreso", $("#modal_fechaingreso").val());
-                        datos.append("idCliente", $("#modal_idcliente").val());
-                        datos.append("idTecnico", $("#modal_nombretecnico").val());
-                        datos.append("idModelo", $("#modal_modelo").val());
-                        datos.append("falla", $("#modal_falla").val());
-                        datos.append("observaciones", $("#modal_observaciones").val());
-                        datos.append("presupuesto", $("#modal_presupuesto").val());
-                        datos.append("fechaCierre", $("#modal_fechacierre").val());
-                        datos.append("fechaEntrega", $("#modal_fechaentrega").val());
-
-                        $.ajax({
-                            url: "ajax/servicio_tecnico.ajax.php",
-                            method: "POST",
-                            data: datos,
-                            cache: false,
-                            contentType: false,
-                            processData: false,
-                            dataType: 'json',
-                            success: function(respuesta) {
-
-                                if (respuesta == "ok") {
-                                    Toast.fire({
-                                        icon: 'success',
-                                        title: 'Registro OK (flujo experimental)'
-                                    });
-
-                                    table.ajax.reload();
-                                    fnc_limpiarFormularioModal();
-
-                                } else {
-                                    Toast.fire({
-                                        icon: 'error',
-                                        title: 'El producto no se pudo registrar'
-                                    });
-                                }
-
-                            }
-                        });
-
-                    }
-                })
-            } else {
-                console.log("No paso la validacion")
-            }
-
-            form.classList.add('was-validated');
-
-        });
-    }
+🔍 Buscadores
+Actual	Nuevo
+id_ot_busqueda	st_busqueda_ot
+id_marca_busqueda	st_busqueda_marca
+id_modelo_busqueda	st_busqueda_modelo
+id_nombrecliente_busqueda	st_busqueda_cliente
+inputFechaIngresoDesde	st_fecha_desde
+inputFechaIngresoHasta	st_fecha_hasta
+btnLimpiarBusqueda	st_btn_limpiar_busqueda
+📊 Tabla
+Actual	Nuevo
+table st_table
+tbl_serviciotecnico	st_tabla_ot
+🪟 Modal
+Actual	Nuevo
+mdlGestionarOT	st_modal_ot
+tituloModalOT	st_titulo_modal_ot
+btnCerrarModal	st_btn_cerrar_modal
+frm-datos-OT	st_form_ot
+🧾 Campos del modal
+Actual	Nuevo
+modal_OT	st_ot
+modal_fechaingreso	st_fecha_ingreso
+modal_marca	st_marca
+modal_modelo	st_modelo
+modal_nombretecnico	st_tecnico
+modal_idcliente	st_id_cliente
+modal_nombrecliente	st_nombre_cliente
+lista_clientes	st_lista_clientes
+modal_falla	st_falla
+modal_observaciones	st_observaciones
+modal_presupuesto	st_presupuesto
+modal_fechacierre	st_fecha_cierre
+modal_fechaentrega	st_fecha_entrega
+🎛 Botones
+Actual	Nuevo
+btnCancelarRegistro	st_btn_cancelar
+btnGuardarServicioTecnico	st_btn_guardar
 
 
-    /* ============================================================
-       🔹 INICIALIZACIÓN AL CARGAR LA PÁGINA
-       ============================================================ */
-
-    $(document).ready(function(){
-
-        // 🔹 Test de conexión inicial
-        $.ajax({
-            url: "ajax/servicio_tecnico.ajax.php",
-            type: "POST",
-            data: {'accion' : 1},
-            dataType: 'json',
-            success:function(respuesta){
-                console.log("respuesta",respuesta);
-            }
-        });
-
-        // 🔹 Inicializaciones
-        fnc_cargarSelectMarcaBuscada();
-        fnc_cargar_tbl_serviciotecnico();
-    });
+============================================================ */
 
 </script>

@@ -79,7 +79,7 @@ class AjaxClientes {
    🔹 NUEVO SISTEMA (ABM con accion)
    ✔ evita interferir con el sistema viejo
 ===================================================== */
-if (isset($_POST["accion"]) && is_string($_POST["accion"])) {
+if (isset($_POST["accion"]) && !is_numeric($_POST["accion"])) {
 
     $ajax = new AjaxClientes();
 
