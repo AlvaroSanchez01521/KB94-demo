@@ -45,9 +45,9 @@
                     <li class="nav-item">
                     <a class="nav-link"
                         style="cursor:pointer"
-                        onclick="abrirModulo(this, 'vistas/movimiento_dia.php', 'Nuevo Movimiento')">
+                        onclick="abrirModulo(this, 'vistas/movimiento_dia.php', 'Movimiento del Día')">
                         <i class="nav-icon fas fa-plus-circle"></i>
-                        <p>Nuevo movimiento</p>
+                        <p>Movimiento del Día</p>
                     </a>
                     </li>
 
@@ -56,7 +56,7 @@
                         style="cursor:pointer"
                         onclick="abrirModulo(this, 'vistas/arqueo.php', 'Arqueo de Caja')">
                         <i class="nav-icon fas fa-clipboard-list"></i>
-                        <p>Movimiento del día / Arqueo</p>
+                        <p>Arqueo de Caja</p>
                     </a>
                     </li>
                 </ul>
