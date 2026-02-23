@@ -55,4 +55,11 @@ class MovimientosControlador {
     static public function ctrListarDetalleDia($fecha) {
         return MovimientosModelo::mdlListarDetalleDia($fecha);
     } 
+
+    /*============ Vinculacion OT y Movimiento =======*/
+    static public function ctrObtenerPagosPorOT($idOT) {
+    return MovimientosModelo::mdlObtenerPagosPorOT($idOT);
+}
+
+    
 }

@@ -53,6 +53,15 @@ class AjaxMovimientos {
         $respuesta = MovimientosControlador::ctrListarDetalleDia($_POST["fecha"]);
         echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
     }
+
+    /*========= vinculacion OT movimiento ======= */
+    
+        public function ajaxPagoPorOT() {
+         $respuesta = MovimientosControlador::ctrObtenerPagosPorOT($_POST["idOT"]);
+    echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+    }
+
+
 }
 
 /*=============================================
@@ -81,6 +90,8 @@ if (isset($_POST["accion"])) {
         case "ver_detalle_dia": 
             $ajax->ajaxVerDetalleDia(); 
             break;
+        case "obtener_pagos_por_ot":
+            $ajax->ajaxPagoPorOT();
     }
 
     exit;

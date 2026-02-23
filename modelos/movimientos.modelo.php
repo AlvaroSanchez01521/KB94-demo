@@ -113,5 +113,20 @@ class MovimientosModelo {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /*=============================================
+    VINCULACION MOVIMIENTO CON OT
+    =============================================*/
+    static public function mdlObtenerPagosPorOT($idOT) {
+        $stmt = Conexion::conectar()->prepare(
+            "SELECT m.fechaMovi, m.importe, t.descripcionMovi 
+            FROM movimientos m
+            INNER JOIN tipomovimientos t ON m.idTipoMovi = t.idTipoMovi
+            WHERE m.idOT = :idOT
+            ORDER BY m.fechaMovi DESC"
+        );
+        $stmt->bindParam(":idOT", $idOT, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 }

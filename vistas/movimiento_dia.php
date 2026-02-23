@@ -77,7 +77,7 @@
               <div class="input-group-prepend">
                 <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
               </div>
-              <input type="text" class="form-control bg-light" id="mov_idOT" placeholder="Bloqueado">
+              <input type="text" class="form-control bg-light" id="mov_idOT" readonly placeholder="Bloqueado">
             </div>
             <small class="text-muted">Este campo solo se completa desde el módulo de Servicio Técnico.</small>
           </div>

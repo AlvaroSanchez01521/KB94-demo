@@ -336,7 +336,35 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
 
 
 </div>
-<!-- /. End Modal--> 
+<!-- /. End Modal OT--> 
+
+<!-- =============================================================================================================================
+VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos diltrada por esta idOT)
+===============================================================================================================================-->
+
+<div class="modal fade" id="st_modalPagos" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-info">
+        <h5 class="modal-title text-white">Historial de Pagos - OT #<span id="st_txtIdOTPagos"></span></h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body p-0">
+        <table class="table table-sm table-striped mb-0" id="st_tablaPagosOT">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Caja/Forma</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody><!-- Dinámico --></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 <script>
@@ -679,14 +707,21 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
                     }
                 },           
                 {
-                    // 🔹 Columna Opciones (editar / eliminar)
+                    //  Columna Opciones (editar / cobrar / info pagos)
                     targets: 17,
                     orderable: false,
                     render: function(data, type, full, meta) {
+                        // full[1] es idOT, full[14] es presupuesto (ajustar índices si varían)
                         return "<center>" +
-                                    "<span class='btnEditarServicioTecnico text-primary px-1' style='cursor:pointer;'>" +
+                                    "<span class='btnEditarServicioTecnico text-primary px-1' style='cursor:pointer;' title='Editar OT'>" +
                                         "<i class='fas fa-pencil-alt fs-5'></i>" +
-                                    "</span>" +                                   
+                                    "</span>" +
+                                    "<span class='st_btnCobrar text-success px-1' style='cursor:pointer;' data-idot='"+full[1]+"' data-monto='"+full[14]+"' title='Cobrar en Caja'>" +
+                                        "<i class='fas fa-cash-register fs-5'></i>" +
+                                    "</span>" +
+                                    "<span class='st_btnVerPagos text-info px-1' style='cursor:pointer;' data-idot='"+full[1]+"' title='Ver historial de pagos'>" +
+                                        "<i class='fas fa-info-circle fs-5'></i>" +
+                                    "</span>" +
                                "<center>";
                     }
                 }
@@ -698,6 +733,46 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
 
         });
     }
+
+  
+    // BOTÓN COBRAR (Desde Servicio Técnico a Caja)
+    $(document).on("click", ".st_btnCobrar", function() {
+        
+        // 1. Capturamos los datos de la fila 
+        const idOT = $(this).data("idot");
+        const monto = $(this).data("monto");
+
+        // 2. Ejecutamos la función de plantilla.php
+        // Pasamos null en 'elemento' porque no es un click de sidebar
+        abrirModulo(null, 'vistas/movimiento_dia.php', 'Movimientos del Día');
+
+        // 3. Esperamos a que el módulo de caja esté inyectado en el DOM
+        // Usamos un intervalo para verificar si el modal ya existe
+        let checkModulo = setInterval(function() {
+            
+            if ($("#mov_modal").length > 0) {
+                
+                clearInterval(checkModulo); // Detenemos la espera
+
+                // Ejecutamos la limpieza y carga de datos
+                if (typeof mov_limpiarModal === "function") {
+                    mov_limpiarModal();
+                }
+
+                // Inyectamos los datos de la OT
+                $("#mov_idOT").val(idOT);
+                $("#mov_importe").val(monto);
+                $("#mov_detalle").val("Cobro de reparación OT #" + idOT);
+                
+                // Cambiamos el título visualmente para guiar al usuario
+                $("#mov_modal .modal-title").text("Cobrar Orden de Trabajo #" + idOT);
+                
+                // Abrimos el modal de caja
+                $("#mov_modal").modal("show");
+            }
+        }, 100); // Revisa cada 100ms
+    });
+
 
     // Cargar select Marca del buscador
     function fnc_cargarSelectMarcaBuscada(){
@@ -750,6 +825,47 @@ VENTANA MODAL PARA REGISTRAR O ACTUALIZAR UNA ORDEN DE TRABAJO
     ===================================== */
 
     //EVENTOS//
+
+$(document).on("click", ".st_btnVerPagos", function() {
+    const idOT = $(this).data("idot");
+      console.log("🔍 Consultando pagos para OT:", idOT);
+     
+    // Primero nos aseguramos de que el modal de pagos exista en el HTML de Servicio Técnico
+    $("#st_txtIdOTPagos").text(idOT);
+
+    let datos = new FormData();
+    datos.append("accion", "obtener_pagos_por_ot");
+    datos.append("idOT", idOT);
+
+    $.ajax({
+        url: "ajax/movimientos.ajax.php",
+        method: "POST",
+        data: datos,
+        cache: false, contentType: false, processData: false, dataType: "json",
+        success: function(respuesta) {
+            console.log("Datos modal minimalista:",respuesta)
+            let tbody = $("#st_tablaPagosOT tbody");
+            tbody.empty();
+
+            if(respuesta.length > 0) {
+                respuesta.forEach(p => {
+                    tbody.append(`
+                        <tr>
+                            <td>${p.fechaMovi}</td>
+                            <td>${p.descripcionMovi}</td>
+                            <td class="text-success font-weight-bold">$ ${parseFloat(p.importe).toFixed(2)}</td>
+                        </tr>
+                    `);
+                });
+            } else {
+                tbody.append('<tr><td colspan="3" class="text-center text-muted">No se registran pagos.</td></tr>');
+            }
+            $("#st_modalPagos").modal("show");
+        }
+    });
+});
+
+
 
     // Al abrir modal se ejecuta + fecha hoy en alta
     $("#st_modal_ot").on("shown.bs.modal", function () {
