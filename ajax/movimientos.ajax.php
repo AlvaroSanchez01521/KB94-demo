@@ -72,9 +72,15 @@ if (isset($_POST["accion"])) {
         case "guardar": 
             $ajax->ajaxGuardar(); 
             break;
-        case "obtener_saldos_cajas": $ajax->ajaxObtenerSaldos(); break;
-        case "listar_resumen_arqueo": $ajax->ajaxListarResumen(); break;
-        case "ver_detalle_dia": $ajax->ajaxVerDetalleDia(); break;
+        case "obtener_saldos_cajas": 
+            $ajax->ajaxObtenerSaldos(); 
+            break;
+        case "listar_resumen_arqueo": 
+            $ajax->ajaxListarResumen(); 
+            break;
+        case "ver_detalle_dia": 
+            $ajax->ajaxVerDetalleDia(); 
+            break;
     }
 
     exit;

@@ -72,6 +72,18 @@
           </div>
 
           <div class="form-group">
+            <label>Orden de Trabajo (OT)</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+              </div>
+              <input type="text" class="form-control bg-light" id="mov_idOT" placeholder="Bloqueado">
+            </div>
+            <small class="text-muted">Este campo solo se completa desde el módulo de Servicio Técnico.</small>
+          </div>
+
+
+          <div class="form-group">
             <label>Detalle / Observación</label>
             <input type="text" class="form-control" id="mov_detalle" maxlength="50" placeholder="Ej: Pago de internet">
           </div>
@@ -122,7 +134,7 @@
         processData: false,
         dataType: "json",
         success: function (respuesta) {
-            console.log("Tabla cargada", respuesta)
+          console.log("Tabla carga", respuesta)
         let tbody = $("#mov_tablaDia tbody");
         tbody.empty();
         let saldoTotal = 0;
@@ -133,28 +145,36 @@
             
             // Color según importe
             let badgeClass = importe >= 0 ? "text-success" : "text-danger";
+            
+            // --- LÓGICA PARA MOSTRAR DETALLE Y OT JUNTOS ---
+            let columnaDetalle = "";            
+            if (item.idOT) {
+                columnaDetalle += `<span class="badge badge-secondary">OT: ${item.idOT}</span> `;
+            }            
+            columnaDetalle += item.detalle ? item.detalle : (item.idOT ? "" : "-");
 
-           tbody.append(`
-                <tr>
-                    <td>${item.idMovimiento}</td>
-                    <td>${item.descripcionMovi}</td>
-                    <td>${item.detalle || (item.idOT ? 'OT: ' + item.idOT : '-')}</td>
-                    <td class="font-weight-bold ${badgeClass}">$ ${importe.toFixed(2)}</td>
-                    <td>
-                    <button class="btn btn-warning btn-sm mov_btnEditar" 
-                        data-id="${item.idMovimiento}" 
-                        data-tipo="${item.idTipoMovi}" 
-                        data-ot="${item.idOT || ''}" 
-                        data-importe="${item.importe}" 
-                        data-detalle="${item.detalle}">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    </td>
-                </tr>
-                `);
+              tbody.append(`
+                  <tr>
+                      <td>${item.idMovimiento}</td>
+                      <td>${item.descripcionMovi}</td>
+                      <td>${columnaDetalle}</td>
+                      <td class="font-weight-bold ${badgeClass}">$ ${importe.toFixed(2)}</td>
+                      <td>
+                          <button class="btn btn-warning btn-sm mov_btnEditar" 
+                              data-id="${item.idMovimiento}" 
+                              data-tipo="${item.idTipoMovi}" 
+                              data-ot="${item.idOT || ''}" 
+                              data-importe="${item.importe}" 
+                              data-detalle="${item.detalle || ''}">
+                              <i class="fas fa-edit"></i>
+                          </button>
+                      </td>
+                  </tr>
+              `);
         });
 
         $("#mov_txtSaldoTotal").text("$ " + saldoTotal.toFixed(2));
+        $("#mov_txtSaldoTotal").removeClass("text-danger text-success");
         if(saldoTotal < 0) $("#mov_txtSaldoTotal").addClass("text-danger");
         else $("#mov_txtSaldoTotal").addClass("text-success");
         }
@@ -198,15 +218,12 @@
         // 2. Crear el objeto FormData
         let datos = new FormData();
         
-        // Estos nombres (las "keys") deben ser EXACTAMENTE iguales a los $_POST del PHP
         datos.append("accion", "guardar");
         datos.append("mov_idMovimiento", $("#mov_idMovimiento").val());
         datos.append("mov_idTipoMovi", idTipo);
         datos.append("mov_importe", importe);
-        datos.append("mov_detalle", $("#mov_detalle").val());
-        
-        // Si tenés el campo idOT, lo agregamos (si no, mandamos vacío)
-        datos.append("mov_idOT", $("#mov_idOT").val() || "");
+        datos.append("mov_detalle", $("#mov_detalle").val()); 
+        datos.append("mov_idOT", $("#mov_idOT").val());
 
         $.ajax({
             url: "ajax/movimientos.ajax.php", 
@@ -231,15 +248,16 @@
         });
     }
 
-
     $(document).on("click", ".mov_btnEditar", function () {
         // 1. Extraer datos del botón (el atributo es data-tipo)
         const id = $(this).data("id");
         const tipoId = $(this).data("tipo"); 
         const importe = $(this).data("importe");
         const detalle = $(this).data("detalle");
+        const ot = $(this).data("ot");
 
         // 2. Cargar los inputs
+        $("#mov_idOT").val(ot); 
         $("#mov_idMovimiento").val(id);
         $("#mov_importe").val(importe);
         $("#mov_detalle").val(detalle);
@@ -253,12 +271,10 @@
         $("#mov_modal").modal("show");
     });
 
-
-
-
     function mov_limpiarModal() {
         $("#mov_form")[0].reset();
         $("#mov_idMovimiento").val("");
+        $("#mov_idOT").val(""); 
         $("#mov_modal .modal-title").text("Nuevo Movimiento");
     }
 </script>
