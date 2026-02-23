@@ -42,4 +42,17 @@ class MovimientosControlador {
         return $respuesta ? "ok" : "error";
     }
 
+    /*============ zona Arqueo =======*/
+    
+    static public function ctrObtenerSaldosPorTipo() {
+        return MovimientosModelo::mdlObtenerSaldosPorTipo();
+    }
+
+    static public function ctrListarResumenArqueo($fechaDesde, $fechaHasta) {
+        return MovimientosModelo::mdlListarResumenArqueo($fechaDesde, $fechaHasta);
+    }
+
+    static public function ctrListarDetalleDia($fecha) {
+        return MovimientosModelo::mdlListarDetalleDia($fecha);
+    } 
 }

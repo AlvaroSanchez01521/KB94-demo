@@ -54,4 +54,64 @@ class MovimientosModelo {
         return $stmt->execute();
     }
 
+
+    /*===== zona Arqueo =====*/
+
+
+    /*=============================================
+    SALDOS TOTALES (PARA LAS 4 TARJETAS)
+    =============================================*/
+    static public function mdlObtenerSaldosPorTipo() {
+        $stmt = Conexion::conectar()->prepare(
+            "SELECT t.idTipoMovi, t.descripcionMovi, SUM(IFNULL(m.importe, 0)) as saldo 
+             FROM tipomovimientos t
+             LEFT JOIN movimientos m ON t.idTipoMovi = m.idTipoMovi
+             GROUP BY t.idTipoMovi 
+             ORDER BY t.idTipoMovi ASC"
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*=============================================
+    RESUMEN DIARIO AGRUPADO (PARA LA TABLA DE ARQUEO)
+    =============================================*/
+    static public function mdlListarResumenArqueo($fechaDesde, $fechaHasta) {
+        $stmt = Conexion::conectar()->prepare(
+            "SELECT m.fechaMovi, 
+                    t.descripcionMovi, 
+                    SUM(m.importe) as netoDia,
+                    m.idTipoMovi
+             FROM movimientos m
+             INNER JOIN tipomovimientos t ON m.idTipoMovi = t.idTipoMovi
+             WHERE m.fechaMovi BETWEEN :desde AND :hasta
+             GROUP BY m.fechaMovi, m.idTipoMovi
+             ORDER BY m.fechaMovi DESC"
+        );
+        $stmt->bindParam(":desde", $fechaDesde, PDO::PARAM_STR);
+        $stmt->bindParam(":hasta", $fechaHasta, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*=============================================
+    DETALLE DE MOVIMIENTOS DE UN DÍA ESPECÍFICO
+    =============================================*/
+    static public function mdlListarDetalleDia($fecha) {
+
+        $stmt = Conexion::conectar()->prepare(
+            "SELECT m.idMovimiento, m.idOT, m.importe, m.detalle, t.descripcionMovi 
+            FROM movimientos m
+            INNER JOIN tipomovimientos t ON m.idTipoMovi = t.idTipoMovi
+            WHERE m.fechaMovi = :fecha
+            ORDER BY m.idMovimiento ASC"
+        );
+
+        $stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
 }
