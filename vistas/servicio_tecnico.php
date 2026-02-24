@@ -537,6 +537,16 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
         });
     });
 
+    //Evento click imprimir comprobante OT
+    $(document).on("click", ".st_btnImprimirOT", function() {
+        const idOT = $(this).data("idot");
+        
+        // Abrimos una ventana nueva
+        const url = "vistas/imprimir_ot.php?idOT=" + idOT;
+        const nombreVentana = "Imprimir OT " + idOT;
+        window.open(url, nombreVentana, "width=800,height=900");
+    });
+
     // Evento para criterio de busqueda 
     $("#st_busqueda_ot").keyup(function(){
         st_table.column($(this).data('index')).search(this.value).draw();
@@ -721,6 +731,9 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
                                     "</span>" +
                                     "<span class='st_btnVerPagos text-info px-1' style='cursor:pointer;' data-idot='"+full[1]+"' title='Ver historial de pagos'>" +
                                         "<i class='fas fa-info-circle fs-5'></i>" +
+                                    "</span>" +
+                                    "<span class='st_btnImprimirOT text-secondary px-1' style='cursor:pointer;' data-idot='"+full[1]+"' title='Imprimir Comprobante'>" +
+                                        "<i class='fas fa-print fs-5'></i>" +
                                     "</span>" +
                                "<center>";
                     }

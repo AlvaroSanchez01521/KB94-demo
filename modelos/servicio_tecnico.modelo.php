@@ -105,44 +105,66 @@ class ServicioTecnicoModelo{
 
     static public function mdlActualizarServicioTecnico($idOT,$idCliente,$idTecnico,$idModelo,$falla,$observaciones,$presupuesto,$fechaCierre,$fechaEntrega){
 
-    try {
+        try {
 
-        // Normaliza fechas vacías a NULL
-        $fechaCierre  = ($fechaCierre == "")  ? null : $fechaCierre;
-        $fechaEntrega = ($fechaEntrega == "") ? null : $fechaEntrega;
+            // Normaliza fechas vacías a NULL
+            $fechaCierre  = ($fechaCierre == "")  ? null : $fechaCierre;
+            $fechaEntrega = ($fechaEntrega == "") ? null : $fechaEntrega;
 
-        $stmt = Conexion::conectar()->prepare(
-            "UPDATE ot SET
-                idCliente     = :idCliente,
-                idTecnico     = :idTecnico,
-                idModelo      = :idModelo,
-                falla         = :falla,
-                observaciones = :observaciones,
-                presupuesto   = :presupuesto,
-                fechaCierre   = :fechaCierre,
-                fechaEntrega  = :fechaEntrega
-             WHERE idOT = :idOT"
-        );
+            $stmt = Conexion::conectar()->prepare(
+                "UPDATE ot SET
+                    idCliente     = :idCliente,
+                    idTecnico     = :idTecnico,
+                    idModelo      = :idModelo,
+                    falla         = :falla,
+                    observaciones = :observaciones,
+                    presupuesto   = :presupuesto,
+                    fechaCierre   = :fechaCierre,
+                    fechaEntrega  = :fechaEntrega
+                WHERE idOT = :idOT"
+            );
 
-        $stmt->bindParam(":idOT", $idOT, PDO::PARAM_INT);
-        $stmt->bindParam(":idCliente", $idCliente, PDO::PARAM_INT);
-        $stmt->bindParam(":idTecnico", $idTecnico, PDO::PARAM_INT);
-        $stmt->bindParam(":idModelo", $idModelo, PDO::PARAM_INT);
-        $stmt->bindParam(":falla", $falla, PDO::PARAM_STR);
-        $stmt->bindParam(":observaciones", $observaciones, PDO::PARAM_STR);
-        $stmt->bindParam(":presupuesto", $presupuesto, PDO::PARAM_STR);
-        $stmt->bindParam(":fechaCierre", $fechaCierre, PDO::PARAM_NULL | PDO::PARAM_STR);
-        $stmt->bindParam(":fechaEntrega", $fechaEntrega, PDO::PARAM_NULL | PDO::PARAM_STR);
+            $stmt->bindParam(":idOT", $idOT, PDO::PARAM_INT);
+            $stmt->bindParam(":idCliente", $idCliente, PDO::PARAM_INT);
+            $stmt->bindParam(":idTecnico", $idTecnico, PDO::PARAM_INT);
+            $stmt->bindParam(":idModelo", $idModelo, PDO::PARAM_INT);
+            $stmt->bindParam(":falla", $falla, PDO::PARAM_STR);
+            $stmt->bindParam(":observaciones", $observaciones, PDO::PARAM_STR);
+            $stmt->bindParam(":presupuesto", $presupuesto, PDO::PARAM_STR);
+            $stmt->bindParam(":fechaCierre", $fechaCierre, PDO::PARAM_NULL | PDO::PARAM_STR);
+            $stmt->bindParam(":fechaEntrega", $fechaEntrega, PDO::PARAM_NULL | PDO::PARAM_STR);
 
-        if($stmt->execute()){
-            return "ok";
-        }else{
-            return "error";
+            if($stmt->execute()){
+                return "ok";
+            }else{
+                return "error";
+            }
+
+        } catch (Exception $e) {
+            return "Excepción: " . $e->getMessage();
         }
-
-    } catch (Exception $e) {
-        return "Excepción: " . $e->getMessage();
     }
+
+
+   static public function mdlObtenerDatosImpresion($idOT) {
+    $stmt = Conexion::conectar()->prepare(
+        "SELECT 
+            o.idOT, o.fechaIngreso, o.falla, o.observaciones, o.presupuesto,
+            c.nombre as cliente, c.dni, c.telefono1, c.telefono2,
+            m.modelo as nombreModelo,
+            ma.marca as nombreMarca,
+            (SELECT SUM(mov.importe) FROM movimientos mov WHERE mov.idOT = o.idOT AND mov.importe > 0) as totalSenia
+         FROM ot o
+         INNER JOIN clientes c ON o.idCliente = c.idCliente
+         INNER JOIN modelos m ON o.idModelo = m.idModelo
+         INNER JOIN marcas ma ON m.idMarca = ma.idMarca
+         WHERE o.idOT = :idOT"
+    );
+
+    $stmt->bindParam(":idOT", $idOT, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 

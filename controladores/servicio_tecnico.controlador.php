@@ -41,4 +41,11 @@ class ServicioTecnicoControlador{
         }
     }
 
+    static public function ctrObtenerDatosImpresion($idOT) {
+        
+        $respuesta = ServicioTecnicoModelo::mdlObtenerDatosImpresion($idOT);
+        return $respuesta;
+    }
+
+
 }
