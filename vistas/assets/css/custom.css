@@ -117,3 +117,24 @@ NAVBAR - ajuste para titulo responsive
   mix-blend-mode: multiply; /* solo sirve para img con contraste bien definido y recomendado fondo blanco */
 }
 
+/* ===================================================
+ AJUSTES TAMAÑO TABLA ot
+====================================================== */
+/* Fuerza a que el texto no impida el achique de la tabla */
+#st_tabla_ot {
+    width: 100% !important;
+}
+
+/* Evita que las celdas de texto largo fuercen un ancho mínimo */
+#st_tabla_ot td {
+    max-width: 150px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Excepto la columna de opciones, que debe verse siempre bien */
+#st_tabla_ot td:last-child {
+    max-width: none;
+    white-space: nowrap;
+}

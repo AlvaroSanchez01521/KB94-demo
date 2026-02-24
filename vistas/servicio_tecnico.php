@@ -3,7 +3,7 @@
      <div class="container-fluid">
          <div class="row mb-2">
              <div class="col-sm-6">
-                 <h1 class="m-0 d-inline-flex align-items-center gap-2">Servivio Tecnico
+                 <h1 class="m-0 d-inline-flex align-items-center gap-2">
                     <!-- ventana ? de ayuda a estado OT -->
                     <span 
                         data-bs-toggle="tooltip"
@@ -11,7 +11,7 @@
                         title="
                         <div class='text-start'>
                             <div><span class='badge bg-warning text-dark'>●</span> Ingresado</div>
-                            <div><span class='badge bg-info text-dark'>●</span> Reparado</div>
+                            <div><span class='badge bg-info text-dark'>●</span> Cerrado</div>
                             <div><span class='badge bg-success'>●</span> Entregado</div>
                         </div>
                         "
@@ -22,10 +22,7 @@
                  </h1>
              </div><!-- /.col -->
              <div class="col-sm-6">
-                 <ol class="breadcrumb float-sm-right">
-                     <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                     <li class="breadcrumb-item active">Servicio Tecnico</li>
-                 </ol>
+                 
              </div><!-- /.col -->
          </div><!-- /.row -->
      </div><!-- /.container-fluid -->
@@ -95,34 +92,34 @@
         <!-- row para tabla -->
         <div class="row">
             <div class="col-lg-12">
-
-                <table id="st_tabla_ot" class="table w_100 shadow">
+                <!-- Agregamos 'responsive' y cambiamos 'w_100' por 'display' o 'w-100' de Bootstrap -->
+                <table id="st_tabla_ot" class="table  display responsive nowrap shadow w-100">
                     <thead class="bg-info">
                         <tr>
-                            <th></th> <!-- espacio necesario para el primer icono cuando se hace responsivo -->
-                            <th>O. Trabajo</th>
-                            <th>F. Ingreso</th>
-                            <th>Id Cli.</th>
-                            <th white-space: nowrap >Nombre Cli.</th>
-                            <th>Contacto</th>
-                            <th>Id Marca</th>
-                            <th>Marca</th>
-                            <th>Id Modelo</th>
-                            <th>Modelo</th>
-                            <th>Id Tecnico</th>
-                            <th>Tecnico/s</th>
-                            <th>Falla </th>
-                            <th>Observaciones</th>
-                            <th>Presup.</th>
-                            <th>F. Cierre</th>
-                            <th>F. Entrega</th>
-                            <th class="text-center">Opciones</th>
-
+                            <th style="width: 20px;"></th> <!-- [0] "+" -->
+                            <th>O. Trabajo</th> <!-- [1] -->
+                            <th>F. Ingreso</th> <!-- [2] -->
+                            <th>Id Cli.</th> <!-- [3] -->
+                            <th>Nombre Cli.</th> <!-- [4] -->
+                            <th>Contacto</th> <!-- [5] -->
+                            <th>Id Marca</th> <!-- [6] -->
+                            <th>Marca</th> <!-- [7] -->
+                            <th>Id Modelo</th> <!-- [8] -->
+                            <th>Modelo</th> <!-- [9] -->
+                            <th>Id Tecnico</th> <!-- [10] -->
+                            <th>Tecnico/s</th> <!-- [11] -->
+                            <th>Falla </th> <!-- [12] -->
+                            <th>Observaciones</th> <!-- [13] -->
+                            <th>Presup.</th> <!-- [14] -->
+                            <th>F. Cierre</th> <!-- [15] -->
+                            <th>F. Entrega</th> <!-- [16] -->
+                            <th class="text-center">Opciones</th> <!-- [17] -->
                         </tr>
                     </thead>
                 </table>
             </div>
-        </div><!-- fin segundo  row-->
+        </div>
+<!-- fin segundo  row-->
 
     </div><!-- /.container-fluid -->
 </div>
@@ -693,16 +690,20 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
                 }
             },
 
-            columnDefs:
+            columnDefs: // [1] es idOT, [16] es fecha entrega
             [
-                {   //  Columna responsive "+"
+                {   //  Columna responsive "+" 
                     targets: 0,
                     orderable: false,
                     className: 'control'
+                },                
+                {
+                    targets: 1, 
+                    responsivePriority: 1 // Prioridad máxima de visivilidad responsive: se queda siempre visible
                 },
                 {
                     // Columnas ocultas (datos internos)
-                    targets: [3, 6, 8, 10],
+                    targets: [3, 6, 8, 10], // 3 idCliente - 6 idMarca - 8 idModelo - 10 idTecnico
                     visible:false
                 },
                 {   // Formateo de fechas SOLO visual
@@ -715,14 +716,30 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
 
                         return data;
                     }
-                },           
+                },                 
                 {
-                    //  Columna Opciones (editar / cobrar / info pagos)
-                    targets: 17,
+                    targets: [4, 5, 9], // Baja prioridad visibilidad responsive: Cliente, Marca, Modelo (se trata de mostrar pero si no hay lugar se va)
+                    responsivePriority: 3 
+                },
+                {
+                    targets: [12, 13], // 11 Falla y 12 Observaciones
+                    render: function(data, type, row) {
+                        if (type === 'display' && data && data.length > 30) {
+                            // Corta el texto y le agrega los puntos suspensivos
+                            // Además le ponemos un 'title' para que al pasar el mouse se vea el texto completo
+                            return `<span title="${data}">${data.substr(0, 30)}...</span>`;
+                        }
+                    return data;
+                    }
+                },          
+                {
+                    //  Columna Opciones (editar / cobrar / info pagos / imprimir)
+                    targets: 17, 
+                    responsivePriority: 2, // Prioridad alta de visibilidad responsive: solo se oculta si no queda más remedio
                     orderable: false,
-                    render: function(data, type, full, meta) {
-                        // full[1] es idOT, full[14] es presupuesto (ajustar índices si varían)
-                        return "<center>" +
+                    render: function(data, type, full, meta) {                        
+                        // Usa div con min-width para que los iconos tengan espacio y no se amontonen
+                        return "<div style='min-width: 120px; text-align: center; white-space: nowrap;'>" +
                                     "<span class='btnEditarServicioTecnico text-primary px-1' style='cursor:pointer;' title='Editar OT'>" +
                                         "<i class='fas fa-pencil-alt fs-5'></i>" +
                                     "</span>" +
@@ -735,9 +752,10 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
                                     "<span class='st_btnImprimirOT text-secondary px-1' style='cursor:pointer;' data-idot='"+full[1]+"' title='Imprimir Comprobante'>" +
                                         "<i class='fas fa-print fs-5'></i>" +
                                     "</span>" +
-                               "<center>";
+                            "</div>";
                     }
                 }
+
             ],
 
             language: {

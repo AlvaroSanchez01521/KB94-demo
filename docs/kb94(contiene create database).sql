@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-02-2026 a las 15:43:55
+-- Tiempo de generación: 24-02-2026 a las 21:01:09
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `kb94`
 --
+CREATE DATABASE IF NOT EXISTS `kb94` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `kb94`;
 
 DELIMITER $$
 --
@@ -132,14 +134,16 @@ DELIMITER ;
 -- Estructura de tabla para la tabla `clientes`
 --
 
-CREATE TABLE `clientes` (
-  `idCliente` int(11) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `idCliente` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `nombre` varchar(60) NOT NULL,
   `cp` int(11) NOT NULL,
   `telefono1` varchar(15) DEFAULT NULL,
   `telefono2` varchar(15) DEFAULT NULL,
-  `dni` int(9) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `dni` int(9) NOT NULL,
+  PRIMARY KEY (`idCliente`),
+  KEY `fk_cp` (`cp`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `clientes`
@@ -152,8 +156,8 @@ INSERT INTO `clientes` (`idCliente`, `nombre`, `cp`, `telefono1`, `telefono2`, `
 (5, 'Macarena oliva', 2000, '3415972926', '', 0),
 (6, 'Macarena Oliva Olmos', 2000, '0303456', '977656', 0),
 (7, 'Troncha Toro', 2152, '', '', 6666),
-(8, 'roberto ruben', 2152, '', '', 0),
-(9, 'maria antoñeta', 2152, 'la ñeta', 'esto esta mal u', 0),
+(8, 'Roberto Ruben', 2152, '', '', 0),
+(9, 'maria antoñeta', 2152, 'la ñeta', 'esto esta mal', 0),
 (10, 'maria isabel', 2152, 'asd', 'asdasd', 0);
 
 -- --------------------------------------------------------
@@ -162,9 +166,10 @@ INSERT INTO `clientes` (`idCliente`, `nombre`, `cp`, `telefono1`, `telefono2`, `
 -- Estructura de tabla para la tabla `localidades`
 --
 
-CREATE TABLE `localidades` (
+CREATE TABLE IF NOT EXISTS `localidades` (
   `cp` int(4) NOT NULL,
-  `localidad` varchar(60) NOT NULL
+  `localidad` varchar(60) NOT NULL,
+  PRIMARY KEY (`cp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -173,7 +178,6 @@ CREATE TABLE `localidades` (
 
 INSERT INTO `localidades` (`cp`, `localidad`) VALUES
 (342, 'Santa Fe'),
-(666, 'RosarioZona NO'),
 (2000, 'Rosario'),
 (2126, 'Pueblo Ester'),
 (2152, 'Granadero Baigorria');
@@ -184,10 +188,11 @@ INSERT INTO `localidades` (`cp`, `localidad`) VALUES
 -- Estructura de tabla para la tabla `marcas`
 --
 
-CREATE TABLE `marcas` (
-  `idMarca` int(11) NOT NULL,
-  `marca` varchar(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE IF NOT EXISTS `marcas` (
+  `idMarca` int(11) NOT NULL AUTO_INCREMENT,
+  `marca` varchar(25) NOT NULL,
+  PRIMARY KEY (`idMarca`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `marcas`
@@ -211,11 +216,13 @@ INSERT INTO `marcas` (`idMarca`, `marca`) VALUES
 -- Estructura de tabla para la tabla `modelos`
 --
 
-CREATE TABLE `modelos` (
-  `idModelo` int(11) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `modelos` (
+  `idModelo` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `modelo` varchar(25) NOT NULL,
-  `idMarca` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `idMarca` int(11) NOT NULL,
+  PRIMARY KEY (`idModelo`),
+  KEY `id_marca` (`idMarca`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `modelos`
@@ -240,14 +247,17 @@ INSERT INTO `modelos` (`idModelo`, `modelo`, `idMarca`) VALUES
 -- Estructura de tabla para la tabla `movimientos`
 --
 
-CREATE TABLE `movimientos` (
-  `idMovimiento` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `movimientos` (
+  `idMovimiento` int(11) NOT NULL AUTO_INCREMENT,
   `fechaMovi` date NOT NULL,
   `idOT` int(8) UNSIGNED DEFAULT NULL,
   `idTipoMovi` int(11) UNSIGNED NOT NULL,
   `importe` decimal(18,2) NOT NULL,
-  `detalle` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `detalle` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`idMovimiento`),
+  KEY `fk_tipomovimiento` (`idTipoMovi`),
+  KEY `fk_ot` (`idOT`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `movimientos`
@@ -270,7 +280,8 @@ INSERT INTO `movimientos` (`idMovimiento`, `fechaMovi`, `idOT`, `idTipoMovi`, `i
 (15, '2026-02-22', NULL, 3, 333.00, 'Claudio Transferencia'),
 (16, '2026-02-23', NULL, 1, -900.00, 'Galletas'),
 (17, '2026-02-23', 8, 2, 1500.00, 'seña'),
-(18, '2026-02-23', 9, 3, 250.00, 'Cobro de reparación OT #9');
+(18, '2026-02-23', 9, 3, 250.00, 'Cobro de reparación OT #9'),
+(19, '2026-02-24', 5, 3, 28000.00, 'Cobro de reparación OT #5');
 
 -- --------------------------------------------------------
 
@@ -278,18 +289,22 @@ INSERT INTO `movimientos` (`idMovimiento`, `fechaMovi`, `idOT`, `idTipoMovi`, `i
 -- Estructura de tabla para la tabla `ot`
 --
 
-CREATE TABLE `ot` (
-  `idOT` int(11) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `ot` (
+  `idOT` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `fechaIngreso` date NOT NULL,
   `idCliente` int(8) UNSIGNED NOT NULL,
   `idTecnico` int(8) UNSIGNED NOT NULL,
   `idModelo` int(10) UNSIGNED NOT NULL,
-  `falla` varchar(120) NOT NULL,
+  `falla` varchar(130) NOT NULL,
   `observaciones` varchar(200) DEFAULT NULL,
   `presupuesto` decimal(18,2) DEFAULT NULL,
   `fechaCierre` date DEFAULT NULL,
-  `fechaEntrega` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `fechaEntrega` date DEFAULT NULL,
+  PRIMARY KEY (`idOT`),
+  KEY `fk_tecnico` (`idTecnico`),
+  KEY `fk_cliente` (`idCliente`),
+  KEY `fk_modelo` (`idModelo`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `ot`
@@ -297,7 +312,7 @@ CREATE TABLE `ot` (
 
 INSERT INTO `ot` (`idOT`, `fechaIngreso`, `idCliente`, `idTecnico`, `idModelo`, `falla`, `observaciones`, `presupuesto`, `fechaCierre`, `fechaEntrega`) VALUES
 (1, '2024-10-20', 1, 1, 13, 'Falla al cargar', 'Deja cargador', NULL, NULL, NULL),
-(2, '2024-10-20', 3, 2, 9, 'Modulo dañado (luego de golpe)', 'holass gg', 35000.00, '2026-01-28', NULL),
+(2, '2024-10-20', 3, 2, 9, 'Esta frase contiene exactamente ciento treinta caracteres para que puedas verificar la capacidad de tu columna en la base de datos', 'Esta cadena de texto fue diseñada específicamente para llegar a los doscientos caracteres de extensión. Sirve para verificar que el almacenamiento de datos sea correcto y no se corte el contenido.', 35000.00, '2026-01-28', NULL),
 (3, '2024-10-20', 3, 3, 14, 'Falla al cargar', 'carga lenta', 5000.00, NULL, NULL),
 (4, '2024-10-26', 1, 1, 9, 'No enciende', 'R:AbananadoT:placa doblada', 9.09, NULL, NULL),
 (5, '2024-10-25', 1, 2, 13, 'modulo ', 'x', 38000.00, '2024-10-25', '2025-02-04'),
@@ -312,10 +327,11 @@ INSERT INTO `ot` (`idOT`, `fechaIngreso`, `idCliente`, `idTecnico`, `idModelo`, 
 -- Estructura de tabla para la tabla `tecnicos`
 --
 
-CREATE TABLE `tecnicos` (
-  `idTecnico` int(11) UNSIGNED NOT NULL,
-  `nombre` varchar(60) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE IF NOT EXISTS `tecnicos` (
+  `idTecnico` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(60) NOT NULL,
+  PRIMARY KEY (`idTecnico`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `tecnicos`
@@ -324,12 +340,7 @@ CREATE TABLE `tecnicos` (
 INSERT INTO `tecnicos` (`idTecnico`, `nombre`) VALUES
 (1, 'Alvaro'),
 (2, 'Claudio'),
-(3, 'Combinado'),
-(4, 'me confundi y no puedo borrar jeje'),
-(5, 'fgdfgfd'),
-(6, 'sdfgh'),
-(7, 'kjk'),
-(8, 'asasdasdsd');
+(3, 'Combinado');
 
 -- --------------------------------------------------------
 
@@ -337,10 +348,11 @@ INSERT INTO `tecnicos` (`idTecnico`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `tipomovimientos`
 --
 
-CREATE TABLE `tipomovimientos` (
-  `idTipoMovi` int(11) UNSIGNED NOT NULL,
-  `descripcionMovi` varchar(40) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE IF NOT EXISTS `tipomovimientos` (
+  `idTipoMovi` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `descripcionMovi` varchar(40) NOT NULL,
+  PRIMARY KEY (`idTipoMovi`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `tipomovimientos`
@@ -350,111 +362,6 @@ INSERT INTO `tipomovimientos` (`idTipoMovi`, `descripcionMovi`) VALUES
 (1, 'Efectivo'),
 (2, 'Transferencia (A)'),
 (3, 'Transferencia (C)');
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `clientes`
---
-ALTER TABLE `clientes`
-  ADD PRIMARY KEY (`idCliente`),
-  ADD KEY `fk_cp` (`cp`);
-
---
--- Indices de la tabla `localidades`
---
-ALTER TABLE `localidades`
-  ADD PRIMARY KEY (`cp`);
-
---
--- Indices de la tabla `marcas`
---
-ALTER TABLE `marcas`
-  ADD PRIMARY KEY (`idMarca`);
-
---
--- Indices de la tabla `modelos`
---
-ALTER TABLE `modelos`
-  ADD PRIMARY KEY (`idModelo`),
-  ADD KEY `id_marca` (`idMarca`);
-
---
--- Indices de la tabla `movimientos`
---
-ALTER TABLE `movimientos`
-  ADD PRIMARY KEY (`idMovimiento`),
-  ADD KEY `fk_tipomovimiento` (`idTipoMovi`),
-  ADD KEY `fk_ot` (`idOT`);
-
---
--- Indices de la tabla `ot`
---
-ALTER TABLE `ot`
-  ADD PRIMARY KEY (`idOT`),
-  ADD KEY `fk_tecnico` (`idTecnico`),
-  ADD KEY `fk_cliente` (`idCliente`),
-  ADD KEY `fk_modelo` (`idModelo`);
-
---
--- Indices de la tabla `tecnicos`
---
-ALTER TABLE `tecnicos`
-  ADD PRIMARY KEY (`idTecnico`);
-
---
--- Indices de la tabla `tipomovimientos`
---
-ALTER TABLE `tipomovimientos`
-  ADD PRIMARY KEY (`idTipoMovi`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `clientes`
---
-ALTER TABLE `clientes`
-  MODIFY `idCliente` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT de la tabla `marcas`
---
-ALTER TABLE `marcas`
-  MODIFY `idMarca` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
---
--- AUTO_INCREMENT de la tabla `modelos`
---
-ALTER TABLE `modelos`
-  MODIFY `idModelo` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
---
--- AUTO_INCREMENT de la tabla `movimientos`
---
-ALTER TABLE `movimientos`
-  MODIFY `idMovimiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
-
---
--- AUTO_INCREMENT de la tabla `ot`
---
-ALTER TABLE `ot`
-  MODIFY `idOT` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT de la tabla `tecnicos`
---
-ALTER TABLE `tecnicos`
-  MODIFY `idTecnico` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT de la tabla `tipomovimientos`
---
-ALTER TABLE `tipomovimientos`
-  MODIFY `idTipoMovi` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restricciones para tablas volcadas

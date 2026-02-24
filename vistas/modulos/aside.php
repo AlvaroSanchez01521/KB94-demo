@@ -74,43 +74,7 @@
                 </li> 
 
                 <li class="nav-item">
-                <a class="nav-link">
-                    <i class="nav-icon fas fa-chart-pie"></i>
-                    <p>
-                    Análisis
-                    <i class="right fas fa-angle-left"></i>
-                    </p>
-                </a>
-
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                        <a class="nav-link"
-                            style="cursor:pointer"
-                            onclick="abrirModulo(this, 'vistas/reportes_servicio_tecnico.php', 'Reportes Servicio Técnico')">
-                            <i class="nav-icon fas fa-wrench"></i>
-                            <p>Servicio Técnico</p>
-                        </a>
-                        </li>
-
-                        <li class="nav-item">
-                        <a class="nav-link"
-                            style="cursor:pointer"
-                            onclick="abrirModulo(this, 'vistas/reportes_caja.php', 'Reportes Caja')">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                            <p>Caja</p>
-                        </a>
-                        </li>
-
-                        <li class="nav-item">
-                        <a class="nav-link"
-                            style="cursor:pointer"
-                            onclick="abrirModulo(this, 'vistas/reportes_clientes.php', 'Reportes de Clientes')">
-                            <i class="nav-icon fas fa-user-friends"></i>
-                            <p>Clientes</p>
-                        </a>
-                        </li>
-                    </ul>
-
+                
                     <li class="nav-item">
                     <a class="nav-link">
                         <i class="nav-icon fas fa-sliders-h"></i>
@@ -166,16 +130,6 @@
                         </a>
                         </li>
                         
-                        <li class="nav-item">
-                        <a class="nav-link"
-                            style="cursor:pointer"
-                            onclick="abrirModulo(this, 'vistas/datos_empresa.php', 'Datos de la Empresa')">
-                            <i class="nav-icon fas fa-building"></i>
-                            <p>Datos de la Empresa</p>
-                        </a>
-                        </li>
-
-
                     </ul>
 
                 </li> 

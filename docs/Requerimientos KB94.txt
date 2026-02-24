@@ -1,0 +1,54 @@
+===========================================================================
+     SISTEMA DE GESTIÓN INTEGRAL PARA SERVICIO TÉCNICO - K-BYTE 94
+===========================================================================
+PROYECTO: Final de Carrera - Prácticas Profesionalizantes
+FECHA: 25/02/2026
+AUTOR: ALVARO RAFAEL SANCHEZ AGÜERO
+ESTADO: Entrega Final
+===========================================================================
+
+[ DESCRIPCIÓN GENERAL ]
+---------------------------------------------------------------------------
+Desarrollo de una solución tecnológica diseñada para optimizar la 
+operativa de un servicio técnico de telefonía móvil. El objetivo es un 
+sistema liviano, intuitivo y ágil que evite la sobrecarga administrativa 
+y agilice el registro de información para el personal.
+
+[ GESTIÓN DE EQUIPOS Y CLIENTES ]
+---------------------------------------------------------------------------
+* BASE DE DATOS: Administración eficiente de clientes identificados por 
+  Nombre, Apellido, DNI, Localidad y dos números de contacto.
+  
+* ORDEN DE TRABAJO (OT): Centralización de información crítica:
+  - Marca / Modelo / Falla reportada.
+  - Observaciones técnicas / Presupuesto / Técnico responsable.
+
+* TRAZABILIDAD POR ESTADOS:
+  [INGRESO] -> El equipo entra al taller.
+  [CIERRE]  -> La reparación ha finalizado exitosamente.
+  [ENTREGA] -> El equipo es retirado por el cliente (Fin del ciclo).
+
+[ ACCESIBILIDAD Y SALIDA DE DATOS ]
+---------------------------------------------------------------------------
+* ARQUITECTURA: Sistema de gestión interna con diseño responsivo (PC y 
+  Smartphones).
+  
+* DOCUMENTACIÓN AUTOMATIZADA: Generación de comprobante por DUPLICADO 
+  (Copia Cliente / Copia Laboratorio) al dar de alta una orden.
+
+[ CONTROL ADMINISTRATIVO-CONTABLE ]
+---------------------------------------------------------------------------
+Módulo para el control de movimientos financieros diarios (Ingresos y 
+Egresos) con vinculación opcional a Órdenes de Trabajo.
+
+SEGMENTACIÓN DE FLUJO DE CAJA (Conciliación entre socios):
+  1. Caja de Efectivo (Local).
+  2. Caja Bancaria Socio 1.
+  3. Caja Bancaria Socio 2.
+
+Permite una visión clara en tiempo real de la liquidez y el destino de 
+los fondos generados por la operatividad del negocio.
+
+---------------------------------------------------------------------------
+K-BYTE 94 - Desarrollo de Software 2026
+===========================================================================

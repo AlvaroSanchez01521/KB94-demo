@@ -181,7 +181,7 @@
 
     $("#cpLocalidad")
       .val(cp)
-      .prop("disabled", true);
+      .prop("disabled", false);
 
     $("#nombreLocalidad").val(localidad);
 
@@ -243,7 +243,7 @@
 
         } else if (respuesta === "duplicado") {
 
-          mostrarErrorLocalidad("Ya existe una localidad con este nombre");
+          mostrarErrorLocalidad("Ya existe una localidad con este nombre o Codigo Postal");
 
         } else if (respuesta === "sin_cambios") {
 

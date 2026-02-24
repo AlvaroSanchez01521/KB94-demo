@@ -13,8 +13,18 @@
     </div>
   </div>
 </div>
+<div class="callout callout-warning shadow-sm">
+    <h5><i class="fas fa-exclamation-triangle text-warning"></i> ¡Atención Técnica!</h5>
+    <p class="small">
+        El sistema está diseñado para visualizar <b>3 cajas principales</b> en el Arqueo. 
+        Si agrega una nueva, los movimientos se registrarán correctamente, pero el saldo 
+        total no se reflejará en las tarjetas del tablero principal.
+    </p>
+</div>
+
 
 <!-- CONTENT -->
+ 
 <div class="content">
   <div class="container-fluid">
 
@@ -88,114 +98,137 @@
 
 <script>
 
-$(document).ready(function () {
-  listarTipoMovimientos();
-});
-
-
-// =============================
-// EVENTOS
-// =============================
-
-// Nuevo
-$("#btnNuevoTipoMovi").on("click", function () {
-  limpiarModalTipoMovi();
-  $("#modalTipoMovi .modal-title")
-    .text("Nuevo Tipo de Movimiento");
-  $("#modalTipoMovi").modal("show");
-});
-
-// Submit (ENTER y botón)
-$("#formTipoMovi").on("submit", function (e) {
-  e.preventDefault();
-  guardarTipoMovi();
-});
-
-// Editar
-$(document).on("click", ".btnEditarTipoMovi", function () {
-  cargarTipoMoviParaEditar(this);
-});
-
-// Limpiar al cerrar modal
-$("#modalTipoMovi").on("hidden.bs.modal", function () {
-  limpiarModalTipoMovi();
-});
-
-// Limpiar error al escribir
-$("#descripcionMovi").on("input", function () {
-  limpiarErrorTipoMovi();
-});
-
-
-// =============================
-// LISTAR
-// =============================
-
-function listarTipoMovimientos() {
-
-  let datos = new FormData();
-  datos.append("accion", "listar");
-
-  $.ajax({
-    url: "ajax/tipomovimientos.ajax.php",
-    method: "POST",
-    data: datos,
-    cache: false,
-    contentType: false,
-    processData: false,
-    dataType: "json",
-
-    success: function (respuesta) {
-
-      let tbody = $("#tablaTipoMovi tbody");
-      tbody.empty();
-
-      respuesta.forEach(function (item) {
-
-        tbody.append(`
-          <tr>
-            <td>${item.idTipoMovi}</td>
-            <td>${item.descripcionMovi}</td>
-            <td>
-              <button class="btn btn-warning btn-sm btnEditarTipoMovi"
-                      data-id="${item.idTipoMovi}"
-                      data-descripcion="${item.descripcionMovi}">
-                <i class="fas fa-edit"></i>
-              </button>
-            </td>
-          </tr>
-        `);
-
-      });
-    }
+  $(document).ready(function () {
+    listarTipoMovimientos();
   });
-}
 
 
-// =============================
-// CARGAR PARA EDITAR
-// =============================
+  // =============================
+  // EVENTOS
+  // =============================
 
-function cargarTipoMoviParaEditar(boton) {
+  // Nuevo
+  $("#btnNuevoTipoMovi").on("click", function () {
 
-  const id = $(boton).data("id");
-  const descripcion = $(boton).data("descripcion");
+      Swal.fire({
+          title: '¡ADVERTENCIA DE INTEGRIDAD!',
+          html: `<div class="text-left">
+                  <p>Está por crear una nueva <b>Caja / Forma de Pago</b>.</p>
+                  <ul>
+                      <li>Esta acción <b>NO se puede deshacer</b> (no podrá borrarla luego).</li>
+                      <li>Si borra un tipo con historial, <b>dañará el Arqueo de Caja</b>.</li>
+                      <li>El tablero visual solo admite 3 cajas; las nuevas no se verán en las tarjetas.</li>
+                  </ul>
+                  <p class="text-center"><b>¿Está seguro de que desea continuar?</b></p>
+                </div>`,
+          icon: 'error', // Ícono rojo de peligro
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Sí, entiendo el riesgo',
+          cancelButtonText: 'Cancelar'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              // Si el usuario acepta, recién ahí limpiamos y abrimos el modal
+              limpiarModalTipoMovi();
+              $("#modalTipoMovi .modal-title").text("Nuevo Tipo de Movimiento");
+              $("#modalTipoMovi").modal("show");
+          }
+      });
 
-  limpiarErrorTipoMovi();
+  });
 
-  $("#idTipoMovi").val(id);
-  $("#descripcionMovi").val(descripcion);
+  // Submit (ENTER y botón)
+  $("#formTipoMovi").on("submit", function (e) {
+    e.preventDefault();
+    guardarTipoMovi();
+  });
 
-  $("#modalTipoMovi .modal-title")
-    .text("Editar Tipo de Movimiento");
+  // Editar
+  $(document).on("click", ".btnEditarTipoMovi", function () {
+    cargarTipoMoviParaEditar(this);
+  });
 
-  $("#modalTipoMovi").modal("show");
-}
+  // Limpiar al cerrar modal
+  $("#modalTipoMovi").on("hidden.bs.modal", function () {
+    limpiarModalTipoMovi();
+  });
+
+  // Limpiar error al escribir
+  $("#descripcionMovi").on("input", function () {
+    limpiarErrorTipoMovi();
+  });
 
 
-// =============================
-// GUARDAR
-// =============================
+  // =============================
+  // LISTAR
+  // =============================
+
+  function listarTipoMovimientos() {
+
+    let datos = new FormData();
+    datos.append("accion", "listar");
+
+    $.ajax({
+      url: "ajax/tipomovimientos.ajax.php",
+      method: "POST",
+      data: datos,
+      cache: false,
+      contentType: false,
+      processData: false,
+      dataType: "json",
+
+      success: function (respuesta) {
+
+        let tbody = $("#tablaTipoMovi tbody");
+        tbody.empty();
+
+        respuesta.forEach(function (item) {
+
+          tbody.append(`
+            <tr>
+              <td>${item.idTipoMovi}</td>
+              <td>${item.descripcionMovi}</td>
+              <td>
+                <button class="btn btn-warning btn-sm btnEditarTipoMovi"
+                        data-id="${item.idTipoMovi}"
+                        data-descripcion="${item.descripcionMovi}">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+          `);
+
+        });
+      }
+    });
+  }
+
+
+  // =============================
+  // CARGAR PARA EDITAR
+  // =============================
+
+  function cargarTipoMoviParaEditar(boton) {
+
+    const id = $(boton).data("id");
+    const descripcion = $(boton).data("descripcion");
+
+    limpiarErrorTipoMovi();
+
+    $("#idTipoMovi").val(id);
+    $("#descripcionMovi").val(descripcion);
+
+    $("#modalTipoMovi .modal-title")
+      .text("Editar Tipo de Movimiento");
+
+    $("#modalTipoMovi").modal("show");
+  }
+
+
+  // =============================
+  // GUARDAR
+  // =============================
 
 function guardarTipoMovi() {
 
