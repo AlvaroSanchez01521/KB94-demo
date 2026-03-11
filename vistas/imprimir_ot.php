@@ -131,9 +131,9 @@ $fechaFormateada = date("d/m/Y", strtotime($datos['fechaIngreso']));
         <div class="talon">
             <div class="header">
                 <div class="logo-empresa">
-                    <h1>K-BYTE 94</h1>
-                    <p>Ayala Gauna 7984 Local "C" - Rosario </p>
-                    <p>Contacto: 3415972926 - 3417205875 </p>                    
+                    <h1>TU Local</h1>
+                    <p>Av. Siempre viva 742 - Rosario </p>
+                    <p>Contacto: 3415979926 - 3417255875 </p>                    
                 </div>
                 <div class="nro-orden">
                     <small><b>COPIA LOCAL (RECEPCIÓN)</b></small>
@@ -203,9 +203,9 @@ $fechaFormateada = date("d/m/Y", strtotime($datos['fechaIngreso']));
         <div class="talon">
             <div class="header">
                 <div class="logo-empresa">
-                    <h1>K-BYTE 94</h1>
-                    <p>Ayala Gauna 7984 Local "C" - Rosario </p>
-                    <p>Contacto: 3415972926 - 3417205875 </p>
+                    <h1>TU Local</h1>
+                    <p>Av. Siempre viva 742 - Rosario </p>
+                    <p>Contacto: 3415979926 - 3417255875 </p>  
                     <p>Servicio Técnico especializado en telefonía móvil, PC, notebook, tablet y más.</p>
                 </div>
                 <div class="nro-orden">
