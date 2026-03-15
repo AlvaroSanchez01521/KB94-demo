@@ -14,27 +14,7 @@ class AjaxMarcas{
         echo json_encode($marcas, JSON_UNESCAPED_UNICODE);
     }
 
-    /* ===============================
-       CREAR
-    =============================== */
-    public function ajaxCrearMarca(){
 
-        $respuesta = MarcasControlador::ctrCrearMarca($_POST["marca"]);
-        echo $respuesta;
-    }
-
-    /* ===============================
-       EDITAR
-    =============================== */
-    public function ajaxEditarMarca(){
-
-        $respuesta = MarcasControlador::ctrEditarMarca(
-            $_POST["idMarca"],
-            $_POST["marca"]
-        );
-
-        echo $respuesta;
-    }
 }
 
 /* =====================================================
@@ -50,15 +30,8 @@ if (isset($_POST["accion"])) {
         case "listar":
             $ajax->ajaxListarMarcas();
             break;
-
-        case "crear":
-            $ajax->ajaxCrearMarca();
-            break;
-
-        case "editar":
-            $ajax->ajaxEditarMarca();
-            break;
     }
+
 
     exit;
 }

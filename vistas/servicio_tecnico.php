@@ -740,19 +740,26 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
                     render: function(data, type, full, meta) {                        
                         // Usa div con min-width para que los iconos tengan espacio y no se amontonen
                         return "<div style='min-width: 120px; text-align: center; white-space: nowrap;'>" +
+                                    // Botón Editar (Activo)
                                     "<span class='btnEditarServicioTecnico text-primary px-1' style='cursor:pointer;' title='Editar OT'>" +
                                         "<i class='fas fa-pencil-alt fs-5'></i>" +
                                     "</span>" +
-                                    "<span class='st_btnCobrar text-success px-1' style='cursor:pointer;' data-idot='"+full[1]+"' data-monto='"+full[14]+"' title='Cobrar en Caja'>" +
+                                    
+                                    // Botón Cobrar (Deshabilitado - Modo Demo)
+                                    "<span class='st_btnCobrar text-muted px-1' style='cursor:not-allowed; opacity: 0.6;' title='Cobrar en Caja (No disponible en Modo Demo)'>" +
                                         "<i class='fas fa-cash-register fs-5'></i>" +
                                     "</span>" +
-                                    "<span class='st_btnVerPagos text-info px-1' style='cursor:pointer;' data-idot='"+full[1]+"' title='Ver historial de pagos'>" +
+                                    
+                                    // Botón Ver Pagos (Deshabilitado - Modo Demo)
+                                    "<span class='st_btnVerPagos text-muted px-1' style='cursor:not-allowed; opacity: 0.6;' title='Ver historial de pagos (No disponible en Modo Demo)'>" +
                                         "<i class='fas fa-info-circle fs-5'></i>" +
                                     "</span>" +
+                                    
+                                    // Botón Imprimir (Activo)
                                     "<span class='st_btnImprimirOT text-secondary px-1' style='cursor:pointer;' data-idot='"+full[1]+"' title='Imprimir Comprobante'>" +
                                         "<i class='fas fa-print fs-5'></i>" +
                                     "</span>" +
-                            "</div>";
+                                "</div>";
                     }
                 }
 
@@ -1198,7 +1205,8 @@ $(document).on("click", ".st_btnVerPagos", function() {
         bloquearModelo();
 
         if (!validarMarca()) { // Si la marca NO es válida, corto la ejecución
-            return;
+        console.log("!validarMarca"); // DEBUG    
+        return;
         }
 
         var idMarca = $(this).val();
@@ -1215,7 +1223,7 @@ $(document).on("click", ".st_btnVerPagos", function() {
             contentType: false,
             processData: false,
             dataType: "json",
-            success: function (respuesta) {
+            success: function (respuesta) {               
 
                 if (!respuesta || respuesta.length === 0) { // Si no hay respuesta o está vacía
 

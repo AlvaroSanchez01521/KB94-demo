@@ -25,32 +25,7 @@ class AjaxModelos {
         echo json_encode($modelos, JSON_UNESCAPED_UNICODE);
     }
 
-    /* ===============================
-       CREAR
-    =============================== */
-    public function ajaxCrearModelo() {
 
-        $respuesta = ModelosControlador::ctrCrearModelo(
-            $_POST["modelo"],
-            $_POST["idMarca"]
-        );
-
-        echo $respuesta;
-    }
-
-    /* ===============================
-       EDITAR
-    =============================== */
-    public function ajaxEditarModelo() {
-
-        $respuesta = ModelosControlador::ctrEditarModelo(
-            $_POST["idModelo"],
-            $_POST["modelo"],
-            $_POST["idMarca"]
-        );
-
-        echo $respuesta;
-    }
 }
 
 
@@ -69,16 +44,8 @@ if (isset($_POST["accion"])) {
             $ajax->ajaxListarModelosPorMarcaABM();
             break;
 
-        case "crear":
-            $ajax->ajaxCrearModelo();
-            break;
 
-        case "editar":
-            $ajax->ajaxEditarModelo();
-            break;
     }
-
-    exit;
 }
 
 /* =====================================================

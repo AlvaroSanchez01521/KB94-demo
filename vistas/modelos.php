@@ -1,358 +1,68 @@
-<!-- HEADER -->
 <div class="content-header">
-  <div class="container-fluid">
-    <div class="row mb-2 align-items-center">
-      <div class="col-sm-6">
-        <h1 class="m-0">Modelos</h1>
-      </div>
-      <div class="col-sm-6 text-right">
-        <button class="btn btn-primary btn-sm" id="btnNuevoModelo">
-          <i class="fas fa-plus"></i> Nuevo Modelo
-        </button>
-      </div>
+    <div class="container-fluid text-center">
+        <h1 class="m-0 text-muted"><i class="fas fa-info-circle"></i> Información del Sistema / System Information</h1>
+        <hr class="w-25 mx-auto border-primary" style="border-top: 2px solid; opacity: 0.5;">
     </div>
-  </div>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
-  <div class="container-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- COLUMNA ESPAÑOL -->
+            <div class="col-md-6">
+                <div class="card card-widget widget-user-2 shadow-sm">
+                    <div class="widget-user-header bg-primary">
+                        <h3 class="widget-user-username ml-0">Versión Demo (Español)</h3>
+                        <h5 class="widget-user-desc ml-0">Sistema de Gestión para Telefonía Móvil</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Esta aplicación es una versión demostrativa simplificada para mostrar el funcionamiento general del sistema.</p>
+                        
+                        <strong class="text-success"><i class="fas fa-check mr-1"></i> Funciones Habilitadas</strong>
+                        <p class="text-sm text-muted">Gestión de Clientes, Técnicos y Órdenes de Trabajo (Creación, Edición e Impresión).</p>
+                        
+                        <hr>
+                        
+                        <strong class="text-danger"><i class="fas fa-ban mr-1"></i> Limitaciones en esta versión</strong>
+                        <ul class="list-unstyled text-sm mt-2">
+                            <li class="mb-1"><strong>Órdenes:</strong> Sin historial ni registro de pagos.</li>
+                            <li class="mb-1"><strong>Módulos Desactivados:</strong> Dashboard, Caja, Movimientos, Arqueo, Marcas, Modelos, Localidades y Formas de pago.</li>
+                        </ul>
 
-    <div class="card">
-      <div class="card-body">
+                        <div class="callout callout-info mt-4 mb-0">
+                            <p class="small mb-0 italic">El objetivo es mostrar la estructura general y el flujo principal de trabajo en un entorno simplificado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- COLUMNA INGLÉS -->
+            <div class="col-md-6">
+                <div class="card card-widget widget-user-2 shadow-sm">
+                    <div class="widget-user-header bg-info">
+                        <h3 class="widget-user-username ml-0">Demo Version (English)</h3>
+                        <h5 class="widget-user-desc ml-0">Mobile Phone Management System</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">This is a demonstration version focused on showcasing the core functionality of the system.</p>
+                        
+                        <strong class="text-success"><i class="fas fa-check mr-1"></i> Available Features</strong>
+                        <p class="text-sm text-muted">Management of Clients, Technicians, and Work Orders (Create, Edit, and Print).</p>
+                        
+                        <hr>
+                        
+                        <strong class="text-danger"><i class="fas fa-ban mr-1"></i> Disabled in this version</strong>
+                        <ul class="list-unstyled text-sm mt-2">
+                            <li class="mb-1"><strong>Orders:</strong> No payment history or registration.</li>
+                            <li class="mb-1"><strong>Modules:</strong> Dashboard, Cash, Daily Movements, Cash History, Brands, Models, Locations, and Payment Methods.</li>
+                        </ul>
 
-        <div class="form-group">
-        <label>Filtrar por Marca</label>
-        <select id="filtroMarca" class="form-control">
-            <option value="">Seleccione una marca</option>
-        </select>
+                        <div class="callout callout-info mt-4 mb-0">
+                            <p class="small mb-0 italic">The goal is to present the general structure and main workflow within a simplified environment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-
-        <table id="tablaModelos" class="table table-bordered table-hover">
-            <thead class="thead-light">
-            <tr>
-                <th style="width: 10%">#</th>
-                <th>Modelo</th>                
-                <th style="width: 15%">Acciones</th>
-            </tr>
-            </thead>
-
-          <tbody>
-            <!-- contenido dinámico -->
-          </tbody>
-        </table>
-
-      </div>
     </div>
-
-  </div>
 </div>
-
-<!-- MODAL MODELO -->
-<div class="modal fade" id="modalModelo" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Nuevo Modelo</h5>
-        <button type="button" class="close" data-dismiss="modal">
-          <span>&times;</span>
-        </button>
-      </div>
-
-      <div class="modal-body">
-
-        <form id="formModelo">
-
-          <input type="hidden" id="idModelo">
-
-          <div class="form-group">
-            <label>Modelo</label>
-            <input type="text" class="form-control" id="nombreModelo" maxlength="60" required>
-            <small class="text-danger d-none" id="errorModelo"></small>
-          </div>
-
-          <div class="form-group">
-            <label>Marca</label>
-            <select class="form-control" id="selectMarca" required>
-              <option value="">Seleccione una marca</option>
-            </select>
-            <small class="text-danger d-none" id="errorMarca"></small>
-          </div>
-
-        </form>
-
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-dismiss="modal">
-          Cancelar
-        </button>
-        <button class="btn btn-success" id="btnGuardarModelo" type="submit" form="formModelo">
-          Guardar
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-
-<script>
-    $(document).ready(function () {
-        cargarMarcas();    
-               
-    });
-
-    /* ===============================
-    EVENTOS
-    =============================== */
-
-    // Filtrar por Modelo
-    $("#filtroMarca").on("change", function () {
-        const idMarca = $(this).val();
-
-        if (idMarca === "") {
-            $("#tablaModelos tbody").html("");
-            return;
-        }
-
-        listarModelosPorMarca(idMarca);
-        console.log("evento cargando tabla, ID Marca:",idMarca)
-    });
-
-
-    // Submit del formulario
-    $("#formModelo").on("submit", function (e) {
-        e.preventDefault();
-        guardarModelo();
-    });
-
-    // Botón Nuevo
-    $("#btnNuevoModelo").on("click", function () {
-        limpiarModalModelo();
-
-        const marcaActual = $("#filtroMarca").val();
-
-        if (marcaActual) {
-            $("#selectMarca").val(marcaActual);
-        }
-
-        $("#modalModelo .modal-title").text("Nuevo Modelo");
-        $("#modalModelo").modal("show");
-    });
-
-    // Botón Editar
-    $(document).on("click", ".btnEditarModelo", function () {
-        cargarModeloParaEditar(this);
-    });
-
-    // Reset al cerrar modal
-    $("#modalModelo").on("hidden.bs.modal", function () {
-        limpiarModalModelo();
-        limpiarErroresModelo();
-    });
-
-    // Limpiar errores al escribir
-    $("#nombreModelo, #selectMarca").on("input change", function () {
-        limpiarErroresModelo();
-    });
-
-
-    /* ===============================
-    LISTAR MODELOS POR MARCA
-    =============================== */
-    function listarModelosPorMarca(idMarca) {
-        console.log("funcion de listado por marca, ID Marca:",idMarca)
-
-        const datos = new FormData();
-        datos.append("accion", "listar");
-        datos.append("idMarca", idMarca);
-
-        console.log(datos)
-
-        $.ajax({
-            url: "ajax/modelos.ajax.php",
-            method: "POST",
-            data: datos,
-            cache: false,
-            contentType: false,
-            processData: false,
-            dataType: "json",
-            success: function (respuesta) {
-                console.log(respuesta)
-
-                let html = "";
-
-                respuesta.forEach((modelo) => {
-                    html += `
-                    <tr>
-                        <td>${modelo.idModelo}</td>                        
-                        <td>${modelo.modelo}</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning btnEditarModelo"
-                                data-id="${modelo.idModelo}"
-                                data-modelo="${modelo.modelo}"                                
-                                data-idmarca="${modelo.idMarca}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr>`;
-                });
-
-                $("#tablaModelos tbody").html(html);
-            }
-        });
-        console.log("se finalizo funcion Listar modelo x marca")
-    }
-
-
-    /* ===============================
-    CARGAR MARCAS EN SELECT
-    =============================== */
-    function cargarMarcas() {
-
-        const datos = new FormData();
-        datos.append("accion", "listar");
-
-        $.ajax({
-            url: "ajax/marcas.ajax.php",
-            method: "POST",
-            data: datos,
-            cache: false,
-            contentType: false,
-            processData: false,
-            dataType: "json",
-            success: function (marcas) {
-
-                let opciones = '<option value="">Seleccione una marca</option>';
-
-                marcas.forEach((marca) => {
-                    opciones += `<option value="${marca.idMarca}">${marca.marca}</option>`;
-                });
-
-                $("#selectMarca").html(opciones);   // modal
-                $("#filtroMarca").html(opciones);   // filtro
-            }
-        });
-    }
-
-
-    /* ===============================
-    GUARDAR (CREAR / EDITAR)
-    =============================== */
-
-    function guardarModelo() {
-
-        const id = $("#idModelo").val();
-        const modelo = $("#nombreModelo").val().trim();
-        const idMarca = $("#selectMarca").val();
-
-        if (modelo === "") {
-            mostrarErrorModelo("El modelo es obligatorio");
-            return;
-        }
-
-        if (idMarca === "") {
-            mostrarErrorMarca("Debe seleccionar una marca");
-            return;
-        }
-
-        let datos = new FormData();
-
-        if (id === "") {
-            datos.append("accion", "crear");
-        } else {
-            datos.append("accion", "editar");
-            datos.append("idModelo", id);
-        }
-
-        datos.append("modelo", modelo);
-        datos.append("idMarca", idMarca);
-
-        $.ajax({
-            url: "ajax/modelos.ajax.php",
-            method: "POST",
-            data: datos,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success: function (respuesta) {
-
-                console.log(respuesta)
-
-                if (respuesta === "ok") {
-
-                    $("#modalModelo").modal("hide");
-                    const marcaActual = $("#filtroMarca").val();
-                    if (marcaActual) listarModelosPorMarca(marcaActual);
-                    toastr.success("Guardado correctamente");
-
-                } else if (respuesta === "duplicado") {
-
-                    mostrarErrorModelo("Ya existe un modelo con ese nombre");
-
-                } else if (respuesta === "sin_cambios") {
-
-                    toastr.info("No se realizaron cambios");
-
-                } else {
-
-                    toastr.error("Error al guardar modelo");
-                }
-            }
-        });
-    }
-
-
-    /* ===============================
-    EDITAR
-    =============================== */
-
-    function cargarModeloParaEditar(boton) {
-        console.log(boton)
-
-        const id = $(boton).data("id");
-        const modelo = $(boton).data("modelo");
-        const idMarca = $(boton).data("idmarca");
-
-        limpiarErroresModelo();
-
-        $("#idModelo").val(id);
-        $("#nombreModelo").val(modelo);
-        $("#selectMarca").val(idMarca);
-
-        $("#modalModelo .modal-title").text("Editar Modelo");
-        $("#modalModelo").modal("show");
-    }
-
-
-    /* ===============================
-    LIMPIADORES
-    =============================== */
-
-    function limpiarModalModelo() {
-        $("#idModelo").val("");
-        $("#nombreModelo").val("");
-        $("#selectMarca").val("");
-    }
-
-    function mostrarErrorModelo(mensaje) {
-        $("#nombreModelo").addClass("is-invalid").focus();
-        $("#errorModelo").text(mensaje).removeClass("d-none");
-    }
-
-    function mostrarErrorMarca(mensaje) {
-        $("#selectMarca").addClass("is-invalid");
-        $("#errorMarca").text(mensaje).removeClass("d-none");
-    }
-
-    function limpiarErroresModelo() {
-        $("#nombreModelo").removeClass("is-invalid");
-        $("#selectMarca").removeClass("is-invalid");
-        $("#errorModelo").addClass("d-none").text("");
-        $("#errorMarca").addClass("d-none").text("");
-    }
-</script>

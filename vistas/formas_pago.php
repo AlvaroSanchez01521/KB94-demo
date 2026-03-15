@@ -1,332 +1,68 @@
-<!-- HEADER -->
 <div class="content-header">
-  <div class="container-fluid">
-    <div class="row mb-2 align-items-center">
-      <div class="col-sm-6">
-        <h1 class="m-0"></h1>
-      </div>
-      <div class="col-sm-6 text-right">
-        <button class="btn btn-primary btn-sm" id="btnNuevoTipoMovi">
-          <i class="fas fa-plus"></i> Nueva Forma de Pago
-        </button>
-      </div>
+    <div class="container-fluid text-center">
+        <h1 class="m-0 text-muted"><i class="fas fa-info-circle"></i> Información del Sistema / System Information</h1>
+        <hr class="w-25 mx-auto border-primary" style="border-top: 2px solid; opacity: 0.5;">
     </div>
-  </div>
-</div>
-<div class="callout callout-warning shadow-sm">
-    <h5><i class="fas fa-exclamation-triangle text-warning"></i> ¡Atención Técnica!</h5>
-    <p class="small">
-        El sistema está diseñado para visualizar <b>3 cajas principales</b> en el Arqueo. 
-        Si agrega una nueva, los movimientos se registrarán correctamente, pero el saldo 
-        total no se reflejará en las tarjetas del tablero principal.
-    </p>
 </div>
 
-
-<!-- CONTENT -->
- 
 <div class="content">
-  <div class="container-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- COLUMNA ESPAÑOL -->
+            <div class="col-md-6">
+                <div class="card card-widget widget-user-2 shadow-sm">
+                    <div class="widget-user-header bg-primary">
+                        <h3 class="widget-user-username ml-0">Versión Demo (Español)</h3>
+                        <h5 class="widget-user-desc ml-0">Sistema de Gestión para Telefonía Móvil</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Esta aplicación es una versión demostrativa simplificada para mostrar el funcionamiento general del sistema.</p>
+                        
+                        <strong class="text-success"><i class="fas fa-check mr-1"></i> Funciones Habilitadas</strong>
+                        <p class="text-sm text-muted">Gestión de Clientes, Técnicos y Órdenes de Trabajo (Creación, Edición e Impresión).</p>
+                        
+                        <hr>
+                        
+                        <strong class="text-danger"><i class="fas fa-ban mr-1"></i> Limitaciones en esta versión</strong>
+                        <ul class="list-unstyled text-sm mt-2">
+                            <li class="mb-1"><strong>Órdenes:</strong> Sin historial ni registro de pagos.</li>
+                            <li class="mb-1"><strong>Módulos Desactivados:</strong> Dashboard, Caja, Movimientos, Arqueo, Marcas, Modelos, Localidades y Formas de pago.</li>
+                        </ul>
 
-    <div class="card">
-      <div class="card-body">
+                        <div class="callout callout-info mt-4 mb-0">
+                            <p class="small mb-0 italic">El objetivo es mostrar la estructura general y el flujo principal de trabajo en un entorno simplificado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <table id="tablaTipoMovi" class="table table-bordered table-hover">
-          <thead class="thead-light">
-            <tr>
-              <th style="width: 15%">ID</th>
-              <th>Descripción</th>
-              <th style="width: 15%">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- contenido dinámico -->
-          </tbody>
-        </table>
+            <!-- COLUMNA INGLÉS -->
+            <div class="col-md-6">
+                <div class="card card-widget widget-user-2 shadow-sm">
+                    <div class="widget-user-header bg-info">
+                        <h3 class="widget-user-username ml-0">Demo Version (English)</h3>
+                        <h5 class="widget-user-desc ml-0">Mobile Phone Management System</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">This is a demonstration version focused on showcasing the core functionality of the system.</p>
+                        
+                        <strong class="text-success"><i class="fas fa-check mr-1"></i> Available Features</strong>
+                        <p class="text-sm text-muted">Management of Clients, Technicians, and Work Orders (Create, Edit, and Print).</p>
+                        
+                        <hr>
+                        
+                        <strong class="text-danger"><i class="fas fa-ban mr-1"></i> Disabled in this version</strong>
+                        <ul class="list-unstyled text-sm mt-2">
+                            <li class="mb-1"><strong>Orders:</strong> No payment history or registration.</li>
+                            <li class="mb-1"><strong>Modules:</strong> Dashboard, Cash, Daily Movements, Cash History, Brands, Models, Locations, and Payment Methods.</li>
+                        </ul>
 
-      </div>
+                        <div class="callout callout-info mt-4 mb-0">
+                            <p class="small mb-0 italic">The goal is to present the general structure and main workflow within a simplified environment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-  </div>
 </div>
-
-
-
-<!-- MODAL TIPO MOVIMIENTO -->
-<div class="modal fade" id="modalTipoMovi" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <form id="formTipoMovi">
-
-        <div class="modal-header">
-          <h5 class="modal-title">Nuevo Tipo de Movimiento</h5>
-          <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-
-          <input type="hidden" id="idTipoMovi">
-
-          <div class="form-group">
-            <label>Descripción</label>
-            <input type="text" class="form-control" id="descripcionMovi" maxlength="40" required>
-            <small class="text-danger d-none" id="errorDescripcionMovi"></small>
-          </div>
-
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Cancelar
-          </button>
-
-          <button type="submit" class="btn btn-success">
-            Guardar
-          </button>
-        </div>
-
-
-      </form>
-
-    </div>
-  </div>
-</div>
-
-
-<script>
-
-  $(document).ready(function () {
-    listarTipoMovimientos();
-  });
-
-
-  // =============================
-  // EVENTOS
-  // =============================
-
-  // Nuevo
-  $("#btnNuevoTipoMovi").on("click", function () {
-
-      Swal.fire({
-          title: '¡ADVERTENCIA DE INTEGRIDAD!',
-          html: `<div class="text-left">
-                  <p>Está por crear una nueva <b>Caja / Forma de Pago</b>.</p>
-                  <ul>
-                      <li>Esta acción <b>NO se puede deshacer</b> (no podrá borrarla luego).</li>
-                      <li>Si borra un tipo con historial, <b>dañará el Arqueo de Caja</b>.</li>
-                      <li>El tablero visual solo admite 3 cajas; las nuevas no se verán en las tarjetas.</li>
-                  </ul>
-                  <p class="text-center"><b>¿Está seguro de que desea continuar?</b></p>
-                </div>`,
-          icon: 'error', // Ícono rojo de peligro
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Sí, entiendo el riesgo',
-          cancelButtonText: 'Cancelar'
-      }).then((result) => {
-          if (result.isConfirmed) {
-              // Si el usuario acepta, recién ahí limpiamos y abrimos el modal
-              limpiarModalTipoMovi();
-              $("#modalTipoMovi .modal-title").text("Nuevo Tipo de Movimiento");
-              $("#modalTipoMovi").modal("show");
-          }
-      });
-
-  });
-
-  // Submit (ENTER y botón)
-  $("#formTipoMovi").on("submit", function (e) {
-    e.preventDefault();
-    guardarTipoMovi();
-  });
-
-  // Editar
-  $(document).on("click", ".btnEditarTipoMovi", function () {
-    cargarTipoMoviParaEditar(this);
-  });
-
-  // Limpiar al cerrar modal
-  $("#modalTipoMovi").on("hidden.bs.modal", function () {
-    limpiarModalTipoMovi();
-  });
-
-  // Limpiar error al escribir
-  $("#descripcionMovi").on("input", function () {
-    limpiarErrorTipoMovi();
-  });
-
-
-  // =============================
-  // LISTAR
-  // =============================
-
-  function listarTipoMovimientos() {
-
-    let datos = new FormData();
-    datos.append("accion", "listar");
-
-    $.ajax({
-      url: "ajax/tipomovimientos.ajax.php",
-      method: "POST",
-      data: datos,
-      cache: false,
-      contentType: false,
-      processData: false,
-      dataType: "json",
-
-      success: function (respuesta) {
-
-        let tbody = $("#tablaTipoMovi tbody");
-        tbody.empty();
-
-        respuesta.forEach(function (item) {
-
-          tbody.append(`
-            <tr>
-              <td>${item.idTipoMovi}</td>
-              <td>${item.descripcionMovi}</td>
-              <td>
-                <button class="btn btn-warning btn-sm btnEditarTipoMovi"
-                        data-id="${item.idTipoMovi}"
-                        data-descripcion="${item.descripcionMovi}">
-                  <i class="fas fa-edit"></i>
-                </button>
-              </td>
-            </tr>
-          `);
-
-        });
-      }
-    });
-  }
-
-
-  // =============================
-  // CARGAR PARA EDITAR
-  // =============================
-
-  function cargarTipoMoviParaEditar(boton) {
-
-    const id = $(boton).data("id");
-    const descripcion = $(boton).data("descripcion");
-
-    limpiarErrorTipoMovi();
-
-    $("#idTipoMovi").val(id);
-    $("#descripcionMovi").val(descripcion);
-
-    $("#modalTipoMovi .modal-title")
-      .text("Editar Tipo de Movimiento");
-
-    $("#modalTipoMovi").modal("show");
-  }
-
-
-  // =============================
-  // GUARDAR
-  // =============================
-
-function guardarTipoMovi() {
-
-  limpiarErrorTipoMovi();
-
-  const id = $("#idTipoMovi").val();
-  const descripcion = $("#descripcionMovi").val().trim();
-
-  if (descripcion === "") {
-    mostrarErrorTipoMovi("La descripción es obligatoria");
-    return;
-  }
-
-  let datos = new FormData();
-
-  if (id === "") {
-    datos.append("accion", "crear");
-  } else {
-    datos.append("accion", "editar");
-    datos.append("idTipoMovi", id);
-  }
-
-  datos.append("descripcionMovi", descripcion);
-
-    $.ajax({
-      url: "ajax/tipomovimientos.ajax.php",
-      method: "POST",
-      data: datos,
-      cache: false,
-      contentType: false,
-      processData: false,
-
-      success: function (respuesta) {
-
-        console.log(respuesta)
-
-        if (respuesta === "ok") {
-
-          $("#modalTipoMovi").modal("hide");
-          listarTipoMovimientos();
-          toastr.success("Guardado correctamente");
-
-        } else if (respuesta === "duplicado") {
-
-          mostrarErrorTipoMovi("Ya existe un tipo con esa descripción");
-
-        } else if (respuesta === "sin_cambios") {
-
-          toastr.info("No se realizaron cambios");
-
-        } else if (respuesta === "vacio") {
-
-          mostrarErrorTipoMovi("La descripción es obligatoria");
-
-        } else {
-
-          toastr.error("Error al guardar");
-        }
-      }
-    });
-  }
-
-
-  // =============================
-  // LIMPIAR MODAL
-  // =============================
-
-  function limpiarModalTipoMovi() {
-
-    $("#idTipoMovi").val("");
-    $("#descripcionMovi").val("");
-
-    limpiarErrorTipoMovi();
-  }
-
-
-  // =============================
-  // MANEJO DE ERRORES
-  // =============================
-
-  function mostrarErrorTipoMovi(mensaje) {
-
-    $("#descripcionMovi")
-      .addClass("is-invalid")
-      .focus();
-
-    $("#errorDescripcionMovi")
-      .text(mensaje)
-      .removeClass("d-none");
-  }
-
-  function limpiarErrorTipoMovi() {
-
-    $("#descripcionMovi").removeClass("is-invalid");
-
-    $("#errorDescripcionMovi")
-      .addClass("d-none")
-      .text("");
-  }
-
-</script>

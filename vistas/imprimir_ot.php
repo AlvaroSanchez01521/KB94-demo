@@ -131,7 +131,7 @@ $fechaFormateada = date("d/m/Y", strtotime($datos['fechaIngreso']));
         <div class="talon">
             <div class="header">
                 <div class="logo-empresa">
-                    <h1>TU Local</h1>
+                    <h1>Your Shop</h1>
                     <p>Av. Siempre viva 742 - Rosario </p>
                     <p>Contacto: 3415979926 - 3417255875 </p>                    
                 </div>
@@ -234,7 +234,7 @@ $fechaFormateada = date("d/m/Y", strtotime($datos['fechaIngreso']));
                     <span>SEÑA: $ <?php echo number_format($datos['totalSenia'] ?? 0, 2, ',', '.'); ?></span>
                 </div>
                 <div class="legales">
-                    Por medio de la presente se deja constancia que el establecimiento no es responsable de la procedencia del equipo descripto, siendo el cliente declarado unico responsable de tener la titularidad del mismo. Una vez transcurridos los 90 días de la reparación, se entenderá que el titular renuncia a la misma, dejando el equipo en propiedad de "K-byte94", esta medida se rige segun los Art. N°2526 y N°2526 del codigo Civil Argentino. Los precios pueden ser modificados sin previo aviso. El establecimiento no se hará cargo de accesorios tales como tarjetas sim, memorias sd, cargadores, cables, fundas.
+                    Por medio de la presente se deja constancia que el establecimiento no es responsable de la procedencia del equipo descripto, siendo el cliente declarado unico responsable de tener la titularidad del mismo. Una vez transcurridos los 90 días de la reparación, se entenderá que el titular renuncia a la misma, dejando el equipo en propiedad de "Your shop", esta medida se rige segun los Art. N°2526 y N°2526 del codigo Civil Argentino. Los precios pueden ser modificados sin previo aviso. El establecimiento no se hará cargo de accesorios tales como tarjetas sim, memorias sd, cargadores, cables, fundas.
                 </div>
 
                 <div class="contenedor-firmas">

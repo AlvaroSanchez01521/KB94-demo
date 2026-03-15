@@ -12,17 +12,6 @@ if (isset($_POST["accion"])) {
         echo json_encode(LocalidadesControlador::ctrListarLocalidades());
     }
 
-    if ($_POST["accion"] === "crear") {
-        echo LocalidadesControlador::ctrCrearLocalidad(
-            $_POST["cp"],
-            trim($_POST["localidad"])
-        );
-    }
+  
 
-    if ($_POST["accion"] === "editar") {
-        echo LocalidadesControlador::ctrEditarLocalidad(
-            $_POST["cp"],
-            trim($_POST["localidad"])
-        );
-    }
 }
