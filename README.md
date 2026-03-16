@@ -133,10 +133,14 @@ This improves maintainability and scalability of the project.
 ---
 
 # Screenshots
+
 ![Dashboard](docs/screenshots/dashboard.png)
-/docs/screenshots/dashboard.png
-/docs/screenshots/work_orders.png
-/docs/screenshots/clients.png
+![Customer Management](/docs/screenshots/cliente_nuevo.png)
+![Work Order](/docs/screenshots/ot_abm.png)
+![New Work Order](/docs/screenshots/ot_nuevo.png)
+![Work Orden Printout](/docs/screenshots/comprobante_ot.png)
+![Work Order - Payment](/docs/screenshots/ot_caja.png)
+![Daily Money Movements](/docs/screenshots/modvimientodia_abm.png)
 
 ---
 
@@ -154,7 +158,7 @@ This improves maintainability and scalability of the project.
 1. Clone the repository
 git clone https://github.com/AlvaroSanchez01521/KB94-v3Git/
 
-2. Import the database structure into MySQL.
+2. Import the database structure located in: database/kb94_demo_database.sql
 
 3. Place the project inside your web server directory (for example `/htdocs` if using XAMPP).
 
