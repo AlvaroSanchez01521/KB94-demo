@@ -1,3 +1,5 @@
+🇪🇸 Spanish version available here: [README_ES.md](README_ES.md)
+
 # Technical Service Management System
 
 A lightweight web-based management system designed to optimize the daily operations of a mobile phone repair and technical service business.
@@ -134,13 +136,13 @@ This improves maintainability and scalability of the project.
 
 # Screenshots
 
-![Dashboard](docs/screenshots/dashboard.png)
-![Customer Management](/docs/screenshots/cliente_nuevo.png)
-![Work Order](/docs/screenshots/ot_abm.png)
-![New Work Order](/docs/screenshots/ot_nuevo.png)
-![Work Orden Printout](/docs/screenshots/comprobante_ot.png)
-![Work Order - Payment](/docs/screenshots/ot_caja.png)
-![Daily Money Movements](/docs/screenshots/modvimientodia_abm.png)
+- ![Dashboard](docs/screenshots/dashboard.png)
+- ![Customer Management](/docs/screenshots/cliente_nuevo.png)
+- ![Work Order](/docs/screenshots/ot_abm.png)
+- ![New Work Order](/docs/screenshots/ot_nuevo.png)
+- ![Work Orden Printout](/docs/screenshots/comprobante_ot.png)
+- ![Work Order - Payment](/docs/screenshots/ot_caja.png)
+- ![Daily Money Movements](/docs/screenshots/modvimientodia_abm.png)
 
 ---
 
