@@ -142,7 +142,7 @@ This improves maintainability and scalability of the project.
 - ![New Work Order](/docs/screenshots/ot_nuevo.png)
 - ![Work Orden Printout](/docs/screenshots/comprobante_ot.png)
 - ![Work Order - Payment](/docs/screenshots/ot_caja.png)
-- ![Daily Money Movements](/docs/screenshots/modvimientodia_abm.png)
+- ![Daily Money Movements](/docs/screenshots/movimientodia_abm.png)
 
 ---
 

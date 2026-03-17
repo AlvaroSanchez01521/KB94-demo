@@ -145,7 +145,7 @@ Esto mejora la mantenibilidad y escalabilidad del sistema.
 - ![New Work Order](/docs/screenshots/ot_nuevo.png)
 - ![Work Orden Printout](/docs/screenshots/comprobante_ot.png)
 - ![Work Order - Payment](/docs/screenshots/ot_caja.png)
-- ![Daily Money Movements](/docs/screenshots/modvimientodia_abm.png)
+- ![Daily Money Movements](/docs/screenshots/movimientodia_abm.png)
 
 ---
 
