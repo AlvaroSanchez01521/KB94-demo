@@ -115,7 +115,7 @@
                         <li class="nav-item">
                         <a class="nav-link"
                             style="cursor:pointer"
-                            onclick="abrirModulo(this, 'vistas/Localidades.php', 'Localidades')">
+                            onclick="abrirModulo(this, 'vistas/localidades.php', 'Localidades')">
                             <i class="nav-icon fas fa-map-marker-alt"></i>
                             <p>Localidades</p>
                         </a>

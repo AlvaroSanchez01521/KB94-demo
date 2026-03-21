@@ -399,7 +399,7 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
 
     // Evento q ejecuta al leer el .php
     $(document).ready(function () {
-        fnc_cargar_tbl_serviciotecnico(); // tabla principañ
+        fnc_cargar_tbl_serviciotecnico(); // tabla principal
         fnc_cargarSelectMarcaBuscada(); // select del buscador
         fnc_Tooltips(); // ayuda memoria ?
     }); 

@@ -1,5 +1,5 @@
 <?php
-
+require_once "../modelos/conexion.php";   
 class LocalidadesModelo {
 
     /* ===============================
