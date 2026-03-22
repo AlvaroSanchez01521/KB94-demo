@@ -3,11 +3,44 @@
 require_once "conexion.php";
 
 class ServicioTecnicoModelo{
+
+     /*=======================================
+    LISTA OT PARA DATATABLE
+    ========================================*/
     static public function mdlListarServicioTecnico(){
-        $stmt = Conexion::conectar()->prepare('call prc_ListarServicioTecnico()');
+
+        $stmt = Conexion::conectar()->prepare("
+            SELECT 	
+                '' AS detalles,
+                ot.idOT,
+                ot.fechaIngreso,
+                ot.idCliente,
+                clientes.nombre AS cliente_nombre,
+                clientes.telefono1,
+                marcas.idMarca,
+                marcas.marca,
+                ot.idModelo,
+                modelos.modelo,
+                ot.idTecnico,
+                tecnicos.nombre AS tecnico_nombre,
+                ot.falla,
+                ot.observaciones,
+                ot.presupuesto,
+                ot.fechaCierre,
+                ot.fechaEntrega,
+                '' AS opciones
+            FROM ot
+            INNER JOIN clientes ON ot.idCliente = clientes.idCliente
+            INNER JOIN modelos ON ot.idModelo = modelos.idModelo
+            INNER JOIN marcas ON modelos.idMarca = marcas.idMarca
+            INNER JOIN tecnicos ON ot.idTecnico = tecnicos.idTecnico
+            ORDER BY ot.idOT DESC
+        ");
+
         $stmt->execute();
+
         return $stmt->fetchAll();
-    } 
+    }
 
      /*=======================================
     REGISTRAR OT DESDE EL FORMULARIO DEL MODAL

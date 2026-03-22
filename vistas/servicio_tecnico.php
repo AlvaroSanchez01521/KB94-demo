@@ -383,7 +383,7 @@ VENTANA MODAL MINIMALISTA PARA "INFO PAGO" (carga datos de tabla movimientos dil
     // variable donde carga el DataTable (se usa constante dentro de la funcion xq crea conflicto con las demas DataTable)
     var st_table;
         
-    //  Acción global del módulo (2=crear, 3=obtener, 4=actualizar)
+    //  Acción global del módulo (1= Listar, 2=crear, 3=obtener, 4=actualizar)
     var accion ;
 
     //  Índice seleccionado en el autocomplete de clientes (uso con flechas ↑ ↓ y Enter)
