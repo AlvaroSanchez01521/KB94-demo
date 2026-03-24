@@ -57,14 +57,15 @@
     <div class="col-lg-12">
         <table id="cli_tablaClientes" class="table table-striped w-100 shadow">
             <thead class="bg-info">
-                <tr>
+                <tr onclick="arq_verDetalleArqueo('${fecha}')" style="cursor:pointer;">
+                    <th style="width: 20px;"></th> <!-- [0] "+" -->
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>DNI</th>
                     <th>Teléfono 1</th>
                     <th>Teléfono 2</th>
                     <th>Localidad</th>
-                    <th class="text-center">Opciones</th>
+                    <th class="text-center">Opciones</th><!-- [0] "Opciones" -->
                 </tr>
             </thead>
         </table>
@@ -250,38 +251,65 @@
                 data: { accion: "listar" },
                 dataSrc: ''
             },
-            responsive: { details: { type: 'column' } },
+
+            responsive: {
+                details: {
+                    type: 'column',
+                    target: 0
+                }
+            },
+
+            columnDefs: [
+                { className: 'dtr-control', orderable: false, targets: 0 },
+
+                // PRIORIDADES (menor número = más importante)
+                { responsivePriority: 1, targets: 2 }, // Nombre
+                { responsivePriority: 2, targets: 7 }, // Opciones
+                { responsivePriority: 3, targets: 1 }, // ID
+
+                { responsivePriority: 4, targets: 4 }, // Teléfono 1 (último en ocultarse)
+                { responsivePriority: 5, targets: 3 }, // DNI
+                { responsivePriority: 6, targets: 5 }, // Teléfono 2
+                { responsivePriority: 7, targets: 6 }  // Localidad (primero en ocultarse)
+            ],
+
             columns: [
-                { data: "idCliente" },
-                { data: "nombre" },
-                { data: "dni" },
-                { data: "telefono1" },
-                { data: "telefono2" },
-                { data: "localidad" },
-                {
+                { data: null, defaultContent: '' }, // Columna +
+
+                { data: "idCliente" },   // 1
+                { data: "nombre" },      // 2
+                { data: "dni" },         // 3
+                { data: "telefono1" },   // 4
+                { data: "telefono2" },   // 5
+                { data: "localidad" },   // 6
+
+                { // 7 - Opciones
                     data: null,
+                    orderable: false,
                     render: function(data, type, row){
                         return `
-                        <center>
-                            <span class="btnEditarCliente text-primary px-1" style="cursor:pointer;"
-                                data-id="${row.idCliente}"
-                                data-nombre="${row.nombre}"
-                                data-dni="${row.dni}"
-                                data-tel1="${row.telefono1}"
-                                data-tel2="${row.telefono2}"
-                                data-cp="${row.cp}">
-                                <i class="fas fa-pencil-alt fs-5"></i>
-                            </span>
-                        </center>`;
+                            <div class="text-center">
+                                <span class="btnEditarCliente text-primary"
+                                    style="cursor:pointer;"
+                                    data-id="${row.idCliente}"
+                                    data-nombre="${row.nombre}"
+                                    data-dni="${row.dni}"
+                                    data-tel1="${row.telefono1}"
+                                    data-tel2="${row.telefono2}"
+                                    data-cp="${row.cp}">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </span>
+                            </div>`;
                     }
                 }
             ],
+
             language:{
                 url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
             }
         });
     }
-
+    
     /* ===============================
     MODAL
     =============================== */

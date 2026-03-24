@@ -138,3 +138,79 @@ NAVBAR - ajuste para titulo responsive
     max-width: none;
     white-space: nowrap;
 }
+
+/* =========================================
+   ARQUEO - TABLA RESUMEN RESPONSIVE
+========================================= */
+
+/* Estilo general (desktop incluido) */
+#arq_tablaResumenDiario {
+    font-size: 0.9rem;
+}
+
+#arq_tablaResumenDiario th,
+#arq_tablaResumenDiario td {
+    padding: 6px;
+    vertical-align: middle;
+}
+
+/* Números alineados a la derecha */
+#arq_tablaResumenDiario td {
+    text-align: right;
+}
+
+/* Fecha alineada a la izquierda */
+#arq_tablaResumenDiario td:first-child {
+    text-align: left;
+    font-weight: 600;
+}
+
+/* Columna total destacada */
+#arq_tablaResumenDiario td:nth-child(5) {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+/* Botón centrado */
+#arq_tablaResumenDiario td:last-child {
+    text-align: center;
+}
+
+/* Hover tipo sistema */
+#arq_tablaResumenDiario tbody tr:hover {
+    background-color: #f1f1f1;
+    transition: 0.2s;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+@media (max-width: 768px) {
+
+    /* Oculta Caja 1, 2 y 3 */
+    #arq_tablaResumenDiario th:nth-child(2),
+    #arq_tablaResumenDiario th:nth-child(3),
+    #arq_tablaResumenDiario th:nth-child(4),
+    #arq_tablaResumenDiario td:nth-child(2),
+    #arq_tablaResumenDiario td:nth-child(3),
+    #arq_tablaResumenDiario td:nth-child(4) {
+        display: none;
+    }
+
+    /* Compacto para celular */
+    #arq_tablaResumenDiario {
+        font-size: 0.8rem;
+    }
+
+    #arq_tablaResumenDiario th,
+    #arq_tablaResumenDiario td {
+        padding: 4px;
+        white-space: nowrap;
+    }
+
+    /* Botón más usable en mobile */
+    #arq_tablaResumenDiario button {
+        padding: 4px 6px;
+    }
+}

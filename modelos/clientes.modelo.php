@@ -40,7 +40,7 @@ class ClientesModelo {
                 l.localidad
             FROM clientes c
             INNER JOIN localidades l ON c.cp = l.cp
-            ORDER BY c.nombre ASC
+            ORDER BY c.idCliente DESC
         ");
 
         $stmt->execute();
